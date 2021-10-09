@@ -130,3 +130,6 @@ dmypy.json
 
 # idea
 **/.idea/**
+
+# resources
+/resources/*.xlsx
