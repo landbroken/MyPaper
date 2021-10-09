@@ -10,7 +10,7 @@ import unittest
 
 from numpy import array
 
-from knn_helper import KNN
+from src.alg.knn_helper import KNN
 
 
 class MyTestCase(unittest.TestCase):
