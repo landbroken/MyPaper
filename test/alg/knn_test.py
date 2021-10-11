@@ -8,18 +8,26 @@
 
 import unittest
 
+import numpy
 from numpy import array
 
-from src.alg.knn_helper import KNN
+from src.alg import knn_helper
 
 
 class MyTestCase(unittest.TestCase):
-    def test_something(self):
+    def test_classify(self):
         labels = ['A', 'A', 'B', 'B']
         group = array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])
-        alg = KNN()
-        result = alg.classify([0, 0], group, labels, 3)
+        result = knn_helper.classify([0, 0], group, labels, 3)
         self.assertEqual(result, 'B')
+
+    def test_classify(self):
+        wait_predict = numpy.array([[0, 0], [1, 1]])
+        labels = numpy.array(['A', 'A', 'B', 'B'])
+        group = numpy.array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])
+        result = knn_helper.ski_classify(wait_predict, group, labels, 3)
+        self.assertEqual(result[0], 'B')
+        self.assertEqual(result[1], 'A')
 
 
 if __name__ == '__main__':
