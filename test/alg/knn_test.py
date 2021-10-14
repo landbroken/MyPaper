@@ -21,7 +21,7 @@ class MyTestCase(unittest.TestCase):
         result = knn_helper.classify([0, 0], group, labels, 3)
         self.assertEqual(result, 'B')
 
-    def test_classify(self):
+    def test_ski_classify(self):
         wait_predict = numpy.array([[0, 0], [1, 1]])
         labels = numpy.array(['A', 'A', 'B', 'B'])
         group = numpy.array([[1.0, 1.1], [1.0, 1.0], [0, 0], [0, 0.1]])

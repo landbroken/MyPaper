@@ -8,11 +8,12 @@
 
 import math
 
+import numpy
 import pandas
 
 
 def single_verify(test_df: pandas.DataFrame, train_df: pandas.DataFrame, fun):
-    fun(test_df, train_df)
+    return fun(test_df, train_df)
 
 
 def cross_verify(verify_cnt: int, df: pandas.DataFrame, fun):
@@ -24,6 +25,7 @@ def cross_verify(verify_cnt: int, df: pandas.DataFrame, fun):
     :return:
     """
     test_size = math.ceil(df.index.size / verify_cnt)  # 测试集大小
+    sum_ret = numpy.array([])
     for i in range(verify_cnt):
         begin_line = 0 + test_size * i
         end_line = begin_line + test_size
@@ -34,4 +36,11 @@ def cross_verify(verify_cnt: int, df: pandas.DataFrame, fun):
         train_df_part2 = df[end_line:]
         train_df = train_df_part1.append(train_df_part2)
         # 执行计算
-        single_verify(test_df, train_df, fun)
+        single_ret = single_verify(test_df, train_df, fun)
+        if i == 0:
+            sum_ret = single_ret
+        else:
+            sum_ret += single_ret
+
+    ret = sum_ret / verify_cnt
+    return ret
