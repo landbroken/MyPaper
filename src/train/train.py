@@ -11,12 +11,12 @@ import pandas
 from src.alg import knn_helper
 
 
-def data_and_label_split(df: pandas.DataFrame, columns_idx: int):
+def column_split(df: pandas.DataFrame, columns_idx: int):
     """
     切分指定的列
-    :param df:
-    :param columns_idx:
-    :return:
+    :param df:待切分的 DataFrame
+    :param columns_idx: 指定列
+    :return: 其余列，指定列
     """
     columns_size = df.columns.size
     columns_begin = 0
@@ -39,12 +39,27 @@ def root_mean_square_error(predict: numpy.ndarray, real: numpy.ndarray):
     return ret
 
 
+def caculate_err_percent(err_arr: numpy.ndarray):
+    abs_arr = numpy.abs(err_arr)
+    columns_size = err_arr.shape[1]
+    line_size = err_arr.shape[0]
+    err_ret = []
+    for i in range(line_size):
+        cur_column = abs_arr[i:i + 1]
+        cur_sum = cur_column.sum()
+        err_val = cur_sum * 1.0 / line_size  # 平均误差绝对值
+        err_percent = err_val / 5  # 平均误差百分比
+        err_ret.append(err_percent)
+    return numpy.array(err_ret)
+
+
 def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
     columns_size = train_df.columns.size
     rmse_columns = []
+    err_columns = []
     for columns_idx in range(columns_size):
-        test_data_set, test_labels = data_and_label_split(test_df, columns_idx)
-        train_data_set, train_labels = data_and_label_split(train_df, columns_idx)
+        test_data_set, test_labels = column_split(test_df, columns_idx)
+        train_data_set, train_labels = column_split(train_df, columns_idx)
         np_test_data_set = numpy.array(test_data_set)
         np_train_data_set = numpy.array(train_data_set)
         np_train_labels = numpy.array(train_labels)
@@ -54,5 +69,8 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
         rmse = root_mean_square_error(result, np_test_labels)
         rmse_columns.append(rmse)
         # 求绝对误差
-        err_arr = result - np_test_labels
-    return numpy.array(rmse_columns)
+        err_single = result - np_test_labels
+        err_columns.append(err_single)
+    err_arr = numpy.array(err_columns)
+    err_percent = caculate_err_percent(err_arr)
+    return numpy.array(rmse_columns), err_percent

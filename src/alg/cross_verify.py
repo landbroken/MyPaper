@@ -26,6 +26,7 @@ def cross_verify(verify_cnt: int, df: pandas.DataFrame, fun):
     """
     test_size = math.ceil(df.index.size / verify_cnt)  # 测试集大小
     sum_ret = numpy.array([])
+    sum_err = numpy.array([])
     for i in range(verify_cnt):
         begin_line = 0 + test_size * i
         end_line = begin_line + test_size
@@ -36,11 +37,14 @@ def cross_verify(verify_cnt: int, df: pandas.DataFrame, fun):
         train_df_part2 = df[end_line:]
         train_df = train_df_part1.append(train_df_part2)
         # 执行计算
-        single_ret = single_verify(test_df, train_df, fun)
+        single_ret, single_err = single_verify(test_df, train_df, fun)
         if i == 0:
             sum_ret = single_ret
+            sum_err = single_err
         else:
             sum_ret += single_ret
+            sum_err += single_err
 
     ret = sum_ret / verify_cnt
-    return ret
+    ret2 = sum_err / verify_cnt
+    return ret, ret2
