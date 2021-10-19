@@ -9,6 +9,7 @@ import numpy
 import pandas
 
 from src.alg import knn_helper
+from src.train import train_cfg
 
 
 def column_split(df: pandas.DataFrame, columns_idx: int):
@@ -32,6 +33,8 @@ def column_split(df: pandas.DataFrame, columns_idx: int):
 
 def root_mean_square_error(predict: numpy.ndarray, real: numpy.ndarray):
     tmp: numpy.ndarray = predict - real
+    times = train_cfg.get_times()
+    tmp = tmp * 1.0 / times  # 还原实际数量级
     tmp = tmp ** 2
     ret: float = tmp.sum()
     ret = ret * 1.0 / tmp.size
@@ -48,7 +51,9 @@ def caculate_err_percent(err_arr: numpy.ndarray):
         cur_column = abs_arr[i:i + 1]
         cur_sum = cur_column.sum()
         err_val = cur_sum * 1.0 / line_size  # 平均误差绝对值
-        err_percent = err_val / 5  # 平均误差百分比
+        times = train_cfg.get_times()
+        table_range_max = train_cfg.get_table_range_max()
+        err_percent = err_val / (times * table_range_max)  # 平均误差百分比
         err_ret.append(err_percent)
     return numpy.array(err_ret)
 
@@ -63,7 +68,8 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
         np_test_data_set = numpy.array(test_data_set)
         np_train_data_set = numpy.array(train_data_set)
         np_train_labels = numpy.array(train_labels)
-        result = knn_helper.ski_classify(np_test_data_set, np_train_data_set, np_train_labels, 10)
+        knn_k = train_cfg.get_knn_k()
+        result = knn_helper.ski_classify(np_test_data_set, np_train_data_set, np_train_labels, knn_k)
         np_test_labels = numpy.array(test_labels)
         # 求偏差，离散程度
         rmse = root_mean_square_error(result, np_test_labels)

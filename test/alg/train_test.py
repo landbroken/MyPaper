@@ -11,6 +11,7 @@ import unittest
 import numpy
 
 from src.train import train
+from src.train.train import TrainCfg
 
 
 class MyTestCase(unittest.TestCase):
