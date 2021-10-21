@@ -53,27 +53,40 @@ def merge_none(df: pandas.DataFrame) -> pandas.DataFrame:
 
 def simplify_table(filepath: str):
     min_err_percent = 0
-    df: pandas.DataFrame = excel_helper.read_resource(filepath)
+    df_origin: pandas.DataFrame = excel_helper.read_resource(filepath)
     merge_fun = train_cfg.get_merge_func()
-    df = merge_fun(df)
+    df = merge_fun(df_origin)
     # 简化计算表格
     question_size = df.columns.size
+    df_train = df
     while question_size > 1:
         if min_err_percent > 0.4:
             # 错误率过高提前跳出
             break
         # 当前轮简化
         cross_verify_times = train_cfg.get_cross_verify_times()
-        rmse_arr, err_percent = cross_verify.cross_verify(cross_verify_times, df, train.train)
+        rmse_arr, err_percent = cross_verify.cross_verify(cross_verify_times, df_train, train.train)
         min_idx = math_helper.min_id(rmse_arr)
         min_err_percent = err_percent[min_idx]
         print("cur rmse = " + str(rmse_arr[min_idx]) +
               ", cur err percent = " + str(min_err_percent) +
               ", idx = " + str(min_idx))
         # 下一轮数据
-        next_df, min_df = train.column_split(df, min_idx)
-        df = next_df
+        next_df, min_df = train.column_split(df_train, min_idx)
+        df_train = next_df
         question_size -= 1
+
+    # 反向连续预测
+    # 1, 0, 2, 1
+    """
+    0, 1, 2, 3, 4
+    0,    1, 2, 3
+          0, 1, 2
+          0, 1
+          0
+    实际删除序号 1, 0, 4, 3
+    """
+    df_train = df
 
 
 train_cfg.set_merge_func(merge_chd)

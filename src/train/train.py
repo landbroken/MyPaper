@@ -50,7 +50,7 @@ def caculate_err_percent(err_arr: numpy.ndarray):
     for i in range(line_size):
         cur_column = abs_arr[i:i + 1]
         cur_sum = cur_column.sum()
-        err_val = cur_sum * 1.0 / line_size  # 平均误差绝对值
+        err_val = cur_sum * 1.0 / columns_size  # 平均误差绝对值
         times = train_cfg.get_times()
         table_range_max = train_cfg.get_table_range_max()
         err_percent = err_val / (times * table_range_max)  # 平均误差百分比
