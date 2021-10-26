@@ -104,16 +104,11 @@ def negative_and_positive_split(df: pandas.DataFrame):
     column_size = df.columns.size
     ret = []
     for i in range(column_size):
-        cur_column: pandas.DataFrame = df.iloc[:, i:(i+1)]
+        cur_column: pandas.DataFrame = df.iloc[:, i:(i + 1)]
         np_cur_column = cur_column.to_numpy()
         ret_is_negative = is_negative(np_cur_column)
         ret.append(ret_is_negative)
     return numpy.array(ret)
 
 
-def mae():
-    """
-    平均绝对值误差(Mean Absolute Error,MAE)
-    :return:
-    """
-    pass
+
