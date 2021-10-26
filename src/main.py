@@ -91,6 +91,9 @@ def simplify_table(filepath: str):
     train.predict(df_predict, df, delete_idx)
 
 
+
+
+
 train_cfg.set_merge_func(merge_chd)
 train_cfg.set_times(10000)
 train_cfg.set_knn_k(10)

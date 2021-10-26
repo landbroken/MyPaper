@@ -11,7 +11,6 @@ import unittest
 import numpy
 
 from src.train import train
-from src.train.train import TrainCfg
 
 
 class MyTestCase(unittest.TestCase):
@@ -21,6 +20,11 @@ class MyTestCase(unittest.TestCase):
         ret = train.root_mean_square_error(predict, real)
         expect = ((1.0 + 0.0 + 1.0 + 4.0) / 4.0) ** 0.5
         self.assertAlmostEqual(ret, expect, delta=0.001)
+
+    def test_is_negative(self):
+        data = numpy.array([1, 2, 3, 4])
+        ret = train.is_negative(data)
+        self.assertEqual(ret, True)
 
 
 if __name__ == '__main__':

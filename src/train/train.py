@@ -82,5 +82,30 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
     return numpy.array(rmse_columns), err_percent
 
 
-def predict(df_predict: pandas.DataFrame, real_data: pandas.DataFrame, delete_idx : numpy.ndarray):
+def predict(df_predict: pandas.DataFrame, real_data: pandas.DataFrame, delete_idx: numpy.ndarray):
+    pass
+
+
+def is_negative(np: numpy.ndarray) -> bool:
+    sum_ret = np.sum()
+    avg = sum_ret / np.size
+    if avg > 2:
+        return True
+    else:
+        return False
+
+
+def negative_and_positive_split(df: pandas.DataFrame):
+    """
+    阴性阳性分割
+    :param df:
+    :return:
+    """
+
+
+def mae():
+    """
+    平均绝对值误差(Mean Absolute Error,MAE)
+    :return:
+    """
     pass
