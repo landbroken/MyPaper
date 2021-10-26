@@ -11,6 +11,7 @@ g_times: int = 10000  # 表格取整计算放大倍数
 g_cross_verify_times: int = 10  # n 折交叉验证
 g_knn_k: int = 10  # knn 的 k
 g_table_range_max: int = 5  # 表格归一化前范围最大值
+g_knn_clf_list = []
 
 
 def set_merge_func(func):
@@ -61,3 +62,18 @@ def set_table_range_max(param):
 def get_table_range_max():
     global g_table_range_max
     return g_table_range_max
+
+
+def set_knn_clf_list(param):
+    global g_knn_clf_list
+    g_knn_clf_list = param
+
+
+def append_knn_clf_list(param):
+    global g_knn_clf_list
+    g_knn_clf_list.append(param)
+
+
+def get_knn_clf_list():
+    global g_knn_clf_list
+    return g_knn_clf_list

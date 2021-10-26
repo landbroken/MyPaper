@@ -12,6 +12,8 @@ import numpy
 from numpy import array, tile
 from sklearn import neighbors, datasets
 
+from src.train import train_cfg
+
 
 def classify(in_x: list, data_set: array, labels: list, k: int):
     """
@@ -41,5 +43,6 @@ def classify(in_x: list, data_set: array, labels: list, k: int):
 def ski_classify(wait_predict: numpy.ndarray, data_set: numpy.ndarray, labels: numpy.ndarray, k: int):
     clf = neighbors.KNeighborsClassifier(k)
     clf.fit(data_set, labels)
+    train_cfg.append_knn_clf_list(clf)
     result = clf.predict(wait_predict)
     return result

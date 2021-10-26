@@ -80,3 +80,7 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
     err_arr = numpy.array(err_columns)
     err_percent = caculate_err_percent(err_arr)
     return numpy.array(rmse_columns), err_percent
+
+
+def predict(df_predict: pandas.DataFrame, real_data: pandas.DataFrame, delete_idx : numpy.ndarray):
+    pass

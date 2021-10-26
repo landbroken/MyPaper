@@ -86,7 +86,9 @@ def simplify_table(filepath: str):
           0
     实际删除序号 1, 0, 4, 3
     """
-    df_train = df
+    df_predict = df
+    delete_idx = numpy.array([1, 0, 4, 3])
+    train.predict(df_predict, df, delete_idx)
 
 
 train_cfg.set_merge_func(merge_chd)
