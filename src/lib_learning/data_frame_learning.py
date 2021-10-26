@@ -16,6 +16,7 @@ print(df)
 
 df2 = df.iloc[:, 0:2]  # 全部行，[0,2)列
 print(df2)
+np_df = df.to_numpy()
 
 df3 = df.iloc[:, 0]  # 全部行，[0,0]列
 print(df3)

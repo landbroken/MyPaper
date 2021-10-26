@@ -9,6 +9,7 @@
 import unittest
 
 import numpy
+import pandas as pd
 
 from src.train import train
 
@@ -25,6 +26,14 @@ class MyTestCase(unittest.TestCase):
         data = numpy.array([1, 2, 3, 4])
         ret = train.is_negative(data)
         self.assertEqual(ret, True)
+
+    def test_negative_and_positive_split(self):
+        df = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 2, 1]], columns=['A', 'B', 'C'])
+        ret = train.negative_and_positive_split(df)
+        self.assertEqual(ret.size, 3)
+        self.assertEqual(ret[0], True)
+        self.assertEqual(ret[1], True)
+        self.assertEqual(ret[2], True)
 
 
 if __name__ == '__main__':
