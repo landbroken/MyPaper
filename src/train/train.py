@@ -31,8 +31,8 @@ def column_split(df: pandas.DataFrame, columns_idx: int):
     return data_set, labels
 
 
-def root_mean_square_error(predict: numpy.ndarray, real: numpy.ndarray):
-    tmp: numpy.ndarray = predict - real
+def root_mean_square_error(_predict: numpy.ndarray, real: numpy.ndarray):
+    tmp: numpy.ndarray = _predict - real
     times = train_cfg.get_times()
     tmp = tmp * 1.0 / times  # 还原实际数量级
     tmp = tmp ** 2

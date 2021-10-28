@@ -24,6 +24,7 @@ def mean_absolute_error(y_true: numpy.ndarray, y_pred: numpy.ndarray):
     """
     平均绝对值误差(Mean Absolute Error,MAE)
     https://blog.csdn.net/wydbyxr/article/details/82894256
+    https://zhuanlan.zhihu.com/p/353125247
     :param y_true: 真实值
     :param y_pred: 预测值
     :return:
