@@ -200,11 +200,11 @@ train_cfg.set_times(10000)
 train_cfg.set_knn_k(10)
 train_cfg.set_cross_verify_times(10)
 train_cfg.set_table_range_max(5)
-# simplify_table("/冠心病.xlsx")
+simplify_table("/冠心病.xlsx")
 
 train_cfg.set_merge_func(merge_chd5)
 train_cfg.set_times(1)
-simplify_table2("/冠心病.xlsx")
+# simplify_table2("/冠心病.xlsx")
 # simplify_table("/高血压.xlsx")
 
 

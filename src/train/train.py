@@ -111,4 +111,13 @@ def negative_and_positive_split(df: pandas.DataFrame):
     return numpy.array(ret)
 
 
+def table_sort(df: pandas.DataFrame, sort_fun) -> pandas.DataFrame:
+    """
+    对表格排序
+    :param df: 待排序表格
+    :param sort_fun: 排序算法
+    :return: 排序后的表格
+    """
+    return sort_fun(df)
+
 
