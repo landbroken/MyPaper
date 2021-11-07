@@ -27,3 +27,15 @@ df5 = pd.DataFrame(np5, columns=['1', '2'])
 df5["1"] = df4["CHD1"] + df4["CHD2"]
 df5["2"] = df4["CHD3"]
 print(df5)
+
+
+def fun(x: int) -> int:
+    ret = 1
+    if x > 3:
+        ret = 0
+    return ret
+
+
+df6 = df4.applymap(fun)
+print("df6 = ")
+print(df6)
