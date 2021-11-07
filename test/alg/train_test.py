@@ -22,18 +22,29 @@ class MyTestCase(unittest.TestCase):
         expect = ((1.0 + 0.0 + 1.0 + 4.0) / 4.0) ** 0.5
         self.assertAlmostEqual(ret, expect, delta=0.001)
 
-    def test_is_negative(self):
-        data = numpy.array([1, 2, 3, 4])
-        ret = train.is_negative(data)
-        self.assertEqual(ret, True)
+    def test_to_negative_and_positive_table(self):
+        df = pd.DataFrame(
+            [
+                [4, 3, 3, 3, 3, 3],
+                [3, 3, 3, 3, 3, 3],
+                [3, 4, 2, 2, 2, 2],
+                [3, 4, 4, 4, 4, 2],
+                [4, 5, 1, 2, 2, 2],
 
-    def test_negative_and_positive_split(self):
-        df = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 2, 1]], columns=['A', 'B', 'C'])
-        ret = train.negative_and_positive_split(df)
-        self.assertEqual(ret.size, 3)
-        self.assertEqual(ret[0], True)
-        self.assertEqual(ret[1], True)
-        self.assertEqual(ret[2], True)
+                [3, 2, 2, 2, 2, 3],
+                [2, 2, 2, 3, 3, 3],
+                [4, 3, 2, 3, 3, 4],
+                [1, 4, 3, 3, 3, 2],
+                [2, 2, 2, 4, 4, 4],
+            ],
+            columns=['CHD1', 'CHD2', 'CHD3', 'CHD4', 'CHD5', 'CHD6'])
+        ret_df = train.to_negative_and_positive_table(df)
+        self.assertEqual(ret_df.iloc[0, 0], 1)
+        self.assertEqual(ret_df.iloc[1, 1], 1)
+        self.assertEqual(ret_df.iloc[2, 2], 0)
+        self.assertEqual(ret_df.iloc[3, 3], 1)
+        self.assertEqual(ret_df.iloc[4, 4], 0)
+        self.assertEqual(ret_df.iloc[5, 5], 1)
 
 
 if __name__ == '__main__':

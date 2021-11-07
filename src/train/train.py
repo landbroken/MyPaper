@@ -5,6 +5,8 @@
 #
 # @Time    : 2021/10/10
 # @Author  : LinYulong
+import typing
+
 import numpy
 import pandas
 
@@ -86,29 +88,21 @@ def predict(df_predict: pandas.DataFrame, real_data: pandas.DataFrame, delete_id
     pass
 
 
-def is_negative(np: numpy.ndarray) -> bool:
-    sum_ret = np.sum()
-    avg = sum_ret / np.size
-    if avg > 2:
-        return True
+def is_negative(score: int) -> int:
+    if score > 2:
+        return 1  # 阴性
     else:
-        return False
+        return 0  # 阳性
 
 
-def negative_and_positive_split(df: pandas.DataFrame):
+def to_negative_and_positive_table(df: pandas.DataFrame) -> pandas.DataFrame:
     """
-    阴性阳性分割
-    :param df:
-    :return:
+    原分數表格转为阴阳性表格
+    :param df: 原始表格
+    :return: 阴阳性表格
     """
-    column_size = df.columns.size
-    ret = []
-    for i in range(column_size):
-        cur_column: pandas.DataFrame = df.iloc[:, i:(i + 1)]
-        np_cur_column = cur_column.to_numpy()
-        ret_is_negative = is_negative(np_cur_column)
-        ret.append(ret_is_negative)
-    return numpy.array(ret)
+    ret = df.applymap(is_negative)
+    return ret
 
 
 def table_sort(df: pandas.DataFrame, sort_fun) -> pandas.DataFrame:
@@ -121,3 +115,18 @@ def table_sort(df: pandas.DataFrame, sort_fun) -> pandas.DataFrame:
     return sort_fun(df)
 
 
+def get_question_group_mark(np: numpy.ndarray):
+    """
+    求题组得分
+    :param np:
+    :return:
+    """
+    pass
+
+
+def get_question_mark(np: numpy.ndarray):
+    """
+    求题目得分
+    :param np:
+    :return:
+    """
