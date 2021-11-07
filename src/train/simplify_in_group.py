@@ -6,6 +6,7 @@
 # @Time    : 2021/11/7
 # @Author  : LinYulong
 # @Description 组内简化
+import numpy
 import pandas
 
 from src.alg.medicine_type import DiseaseCheckType
@@ -73,6 +74,21 @@ def cal_group_np(df: pandas.DataFrame):
     return ret
 
 
+def get_cur_sample_group(df: pandas.DataFrame, pre_idx: list[int]) -> pandas.DataFrame:
+    pre_idx_size = len(pre_idx)
+    column_size = df.columns.size
+    np_zero = numpy.zeros(shape=(0, column_size), dtype=int)
+    old_columns = df.columns
+    ret = pandas.DataFrame(np_zero, columns=old_columns, dtype=int)
+    for i in range(pre_idx_size):
+        begin_line = pre_idx[i]
+        end_line = pre_idx[i] + 1
+        # 测试集
+        tmp_def = df[begin_line:end_line]
+        ret = ret.append(tmp_def)
+    return ret
+
+
 def simplify_in_group_with_df(df_origin: pandas.DataFrame):
     # 预处理为排序后的题组链表
     sorted_group_list = chd_helper.chd_sorted_group_get(df_origin)
@@ -88,8 +104,8 @@ def simplify_in_group_with_df(df_origin: pandas.DataFrame):
             # 选择前置题组中为阳/阴性的测评者
             pre_idx = select_tester(pre_np_list, np_type)
             # 选择这些测评者的当前题组的数据作为实验样本集
-            # cur_sample_group =
-            pass
+            cur_sample_group = get_cur_sample_group(cur_group, pre_idx)
+            simplify_in_one_group(cur_sample_group)
 
 
 def simplify_in_group_main(filepath: str):
