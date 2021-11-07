@@ -5,13 +5,12 @@
 #
 # @Time    : 2021/10/9 23:10
 # @Author  : LinYulong
-import math
 
 import numpy
 import pandas
 
-from src.excel import excel_helper
 from src.alg import cross_verify, math_helper
+from src.excel import excel_helper
 from src.train import train_cfg
 from train import train
 

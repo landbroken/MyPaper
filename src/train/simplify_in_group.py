@@ -14,33 +14,62 @@ from src.excel import excel_helper
 from src.train import train_cfg, train
 
 
-def simplify_in_group(filepath: str):
-    df_origin: pandas.DataFrame = excel_helper.read_resource(filepath)
-    ret_np = train.negative_and_positive_split(df_origin)
-    print("阴阳性计算")
-    print(ret_np)
-
-    merge_fun = train_cfg.get_merge_func()
-    df = merge_fun(df_origin)
-    # 简化计算表格
+def simplify_in_one_group(df: pandas.DataFrame):
+    """
+    单个题组内简化
+    :param df:
+    :return:
+    """
+    # 过滤掉不需要简化的题组。一个题组至少要有两题
     question_size = df.columns.size
-    df_train = df
-    while question_size > 1:
-        # 当前轮简化
-        cross_verify_times = train_cfg.get_cross_verify_times()
-        rmse_arr, err_percent = cross_verify.cross_verify(cross_verify_times, df_train, train.train)
-        min_idx = math_helper.min_id(rmse_arr)
-        min_err_percent = err_percent[min_idx]
-        print("cur rmse = " + str(rmse_arr[min_idx]) +
-              ", cur err percent = " + str(min_err_percent) +
-              ", idx = " + str(min_idx))
-        # 下一轮数据
-        next_df, min_df = train.column_split(df_train, min_idx)
-        df_train = next_df
-        question_size -= 1
+    if question_size < 2:
+        group_name = ""  # TODO
+        print(group_name + "group only one question, do not need to simplify")
+        return
+    # 重要性排序
+    # 选择重要性排名最高的 n 个特征题目
+    for n in range(question_size - 1):
+        pass
+        # x 折交叉验证
+        cross_verify_cnt = 10
+        for x in range(cross_verify_cnt):
+            # train_data, test_data =
+            # 算法拟合
+            # 预测
+            # 预测分值划分成相应的阴阳性
+            # 计算混淆矩阵
+            pass
+        # 计算平均值作为特征评价指标
 
 
-def chd_group_get() -> numpy.ndarray:
+def simplify_in_group_main(filepath: str):
+    df_origin: pandas.DataFrame = excel_helper.read_resource(filepath)
+    # 预处理为题组链表
+    # question_group_list =
+    # 题组排序
+    df_group = df_origin
+    group_size = df_group.columns.size
+    for n in range(group_size):
+        pass
+        # 获取前置题组
+        # TODO pre_group = df_importance.iloc[,]
+        # 获取当前简化题组
+        # TODO cur_group =
+        # 转换为阴阳性表格
+        # np_table =
+        for np_type in range(2):
+            # 选择前置题组中为阳/阴性的测评者
+            # pre_idx =
+            # 选择这些测评者的当前题组的数据作为实验样本集
+            # cur_sample_group =
+            pass
+
+
+def chd_group_type_get() -> numpy.ndarray:
+    """
+    获取未排序的 chd
+    :return:
+    """
     chd_gp = [
         [1, 2, 9],
         [3, 4, 5, 6, 7],
@@ -51,4 +80,19 @@ def chd_group_get() -> numpy.ndarray:
     return numpy.array(chd_gp)
 
 
-simplify_in_group("/冠心病.xlsx")
+def chd_sorted_group_type_get() -> numpy.ndarray:
+    """
+    获取组间排序后的 chd 顺序
+    :return:
+    """
+    chd_gp = [
+        [11],
+        [8, 10],
+        [12, 13, 14],
+        [1, 2, 9],
+        [3, 4, 5, 6, 7],
+    ]
+    return numpy.array(chd_gp)
+
+
+simplify_in_group_main("/冠心病.xlsx")
