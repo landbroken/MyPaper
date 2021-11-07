@@ -165,36 +165,6 @@ def simplify_table(filepath: str):
     train.predict(df_predict, df, delete_idx)
 
 
-def simplify_table2(filepath: str):
-    min_err_percent = 0
-    df_origin: pandas.DataFrame = excel_helper.read_resource(filepath)
-    ret_np = train.negative_and_positive_split(df_origin)
-    print("阴阳性计算")
-    print(ret_np)
-
-    merge_fun = train_cfg.get_merge_func()
-    df = merge_fun(df_origin)
-    # 简化计算表格
-    question_size = df.columns.size
-    df_train = df
-    while question_size > 1:
-        if min_err_percent > 0.4:
-            # 错误率过高提前跳出
-            break
-        # 当前轮简化
-        cross_verify_times = train_cfg.get_cross_verify_times()
-        rmse_arr, err_percent = cross_verify.cross_verify(cross_verify_times, df_train, train.train)
-        min_idx = math_helper.min_id(rmse_arr)
-        min_err_percent = err_percent[min_idx]
-        print("cur rmse = " + str(rmse_arr[min_idx]) +
-              ", cur err percent = " + str(min_err_percent) +
-              ", idx = " + str(min_idx))
-        # 下一轮数据
-        next_df, min_df = train.column_split(df_train, min_idx)
-        df_train = next_df
-        question_size -= 1
-
-
 train_cfg.set_merge_func(merge_chd)
 train_cfg.set_times(10000)
 train_cfg.set_knn_k(10)
@@ -204,7 +174,6 @@ simplify_table("/冠心病.xlsx")
 
 train_cfg.set_merge_func(merge_chd5)
 train_cfg.set_times(1)
-# simplify_table2("/冠心病.xlsx")
 # simplify_table("/高血压.xlsx")
 
 
