@@ -65,34 +65,4 @@ def simplify_in_group_main(filepath: str):
             pass
 
 
-def chd_group_type_get() -> numpy.ndarray:
-    """
-    获取未排序的 chd
-    :return:
-    """
-    chd_gp = [
-        [1, 2, 9],
-        [3, 4, 5, 6, 7],
-        [11],
-        [8, 10],
-        [12, 13, 14],
-    ]
-    return numpy.array(chd_gp)
-
-
-def chd_sorted_group_type_get() -> numpy.ndarray:
-    """
-    获取组间排序后的 chd 顺序
-    :return:
-    """
-    chd_gp = [
-        [11],
-        [8, 10],
-        [12, 13, 14],
-        [1, 2, 9],
-        [3, 4, 5, 6, 7],
-    ]
-    return numpy.array(chd_gp)
-
-
 simplify_in_group_main("/冠心病.xlsx")
