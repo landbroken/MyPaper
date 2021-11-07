@@ -11,6 +11,7 @@ import numpy
 import pandas
 
 from src.alg import knn_helper
+from src.alg.medicine_type import DiseaseCheckType
 from src.train import train_cfg
 
 
@@ -89,10 +90,10 @@ def predict(df_predict: pandas.DataFrame, real_data: pandas.DataFrame, delete_id
 
 
 def is_negative(score: int) -> int:
-    if score > 2:
-        return 1  # 阴性
+    if score > 2:  # 人为指定的
+        return DiseaseCheckType.negative.value  # 阴性
     else:
-        return 0  # 阳性
+        return DiseaseCheckType.positive.value  # 阳性
 
 
 def to_negative_and_positive_table(df: pandas.DataFrame) -> pandas.DataFrame:
@@ -103,10 +104,6 @@ def to_negative_and_positive_table(df: pandas.DataFrame) -> pandas.DataFrame:
     """
     ret = df.applymap(is_negative)
     return ret
-
-
-def sub_table(df: pandas.DataFrame) -> pandas.DataFrame:
-    pass
 
 
 def table_sort(df: pandas.DataFrame, sort_fun) -> pandas.DataFrame:
@@ -134,27 +131,3 @@ def get_question_mark(np: numpy.ndarray):
     :param np:
     :return:
     """
-
-
-def cal_sensitivity(tp: int, fp: int) -> float:
-    """
-    灵敏度计算。
-    灵敏度是指测试正确检测出患有这种疾病的患者的能力
-    https://en.wikipedia.org/wiki/Sensitivity_and_specificity
-    :param tp: 真阳性人数
-    :param fp: 假阳性人数
-    :return:
-    """
-    tpr = tp / (tp + fp * 1.0)  # tp rate
-    return tpr
-
-
-def cal_specificity(tn: int, fp: int) -> float:
-    """
-    特异性计算
-    :param tn: 真阴性人数
-    :param fp: 假阳性人数
-    :return: tnr: 特异性/选择性/真阴性率
-    """
-    tnr = tn / (tn + fp * 1.0)
-    return tnr

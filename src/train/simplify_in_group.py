@@ -6,12 +6,11 @@
 # @Time    : 2021/11/7
 # @Author  : LinYulong
 # @Description 组内简化
-import numpy
 import pandas
 
-from src.alg import cross_verify, math_helper
+from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
-from src.train import train_cfg, train
+from src.train import train, chd_helper
 
 
 def simplify_in_one_group(df: pandas.DataFrame):
@@ -42,27 +41,61 @@ def simplify_in_one_group(df: pandas.DataFrame):
         # 计算平均值作为特征评价指标
 
 
-def simplify_in_group_main(filepath: str):
-    df_origin: pandas.DataFrame = excel_helper.read_resource(filepath)
-    # 预处理为题组链表
-    # question_group_list =
-    # 题组排序
-    df_group = df_origin
-    group_size = df_group.columns.size
-    for n in range(group_size):
-        pass
+def select_tester(np_list, np_type: DiseaseCheckType) -> list[int]:
+    """
+    选择前置题组中为阳/阴性的测评者
+    :param np_list:
+    :param np_type:
+    :return: 列表，被选中的测评者编号
+    """
+    ret = []
+    np_list_size = len(np_list)
+    for i in range(np_list_size):
+        if np_list[i] == np_type.value:
+            ret.append(i)
+    return ret
+
+
+def cal_group_np(df: pandas.DataFrame):
+    """
+    计算题组的阴阳性
+    :param df: 一个题组
+    :return: 每个测评者的阴阳性
+    """
+    ret = []
+    columns_size = df.columns.size
+    for index, row in df.iterrows():
+        row_sum = row.sum()
+        tmp_type = DiseaseCheckType.positive.value
+        if row_sum > (2 * columns_size):
+            tmp_type = DiseaseCheckType.negative.value
+        ret.append(tmp_type)
+    return ret
+
+
+def simplify_in_group_with_df(df_origin: pandas.DataFrame):
+    # 预处理为排序后的题组链表
+    sorted_group_list = chd_helper.chd_sorted_group_get(df_origin)
+    group_size = len(sorted_group_list)
+    for n in range(1, group_size):
         # 获取前置题组
-        # TODO pre_group = df_importance.iloc[,]
+        pre_group = sorted_group_list[n - 1]
         # 获取当前简化题组
-        # TODO cur_group =
-        # 转换为阴阳性表格
-        # np_table =
-        for np_type in range(2):
+        cur_group = sorted_group_list[n]
+        # 计算前置题组的阴阳性
+        pre_np_list = cal_group_np(pre_group)
+        for np_type in DiseaseCheckType:
             # 选择前置题组中为阳/阴性的测评者
-            # pre_idx =
+            pre_idx = select_tester(pre_np_list, np_type)
             # 选择这些测评者的当前题组的数据作为实验样本集
             # cur_sample_group =
             pass
 
 
-simplify_in_group_main("/冠心病.xlsx")
+def simplify_in_group_main(filepath: str):
+    df_origin: pandas.DataFrame = excel_helper.read_resource(filepath)
+    simplify_in_group_with_df(df_origin)
+
+
+if __name__ == "__main__":
+    simplify_in_group_main("/冠心病.xlsx")
