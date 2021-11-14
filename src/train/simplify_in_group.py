@@ -6,6 +6,9 @@
 # @Time    : 2021/11/7
 # @Author  : LinYulong
 # @Description 组内简化
+from enum import EnumMeta
+from typing import Union
+
 import numpy
 import pandas
 
@@ -15,9 +18,10 @@ from src.excel import excel_helper
 from src.train import chd_helper
 
 
-def simplify_in_one_group(df: pandas.DataFrame):
+def simplify_in_one_group(df: pandas.DataFrame, np_type: Union[EnumMeta, DiseaseCheckType]):
     """
     单个题组内简化
+    :param np_type:
     :param df:
     :return:
     """
@@ -38,7 +42,7 @@ def simplify_in_one_group(df: pandas.DataFrame):
         for predict_idx in range(n, question_size):
             # x 折交叉验证
             cross_verify_cnt = 10
-            cross_verify.cross_verify_2(cross_verify_cnt, df_feature, df_other, None)
+            cross_verify.cross_verify_2(cross_verify_cnt, df_feature, df_other, np_type, None)
             pass
         # 计算平均值作为特征评价指标
 
@@ -101,12 +105,13 @@ def simplify_in_group_with_df(df_origin: pandas.DataFrame):
         cur_group = sorted_group_list[n]
         # 计算前置题组的阴阳性
         pre_np_list = cal_group_np(pre_group)
+        np_type: Union[EnumMeta, DiseaseCheckType]
         for np_type in DiseaseCheckType:
             # 选择前置题组中为阳/阴性的测评者
             pre_idx = select_tester(pre_np_list, np_type)
             # 选择这些测评者的当前题组的数据作为实验样本集
             cur_sample_group = get_cur_sample_group(cur_group, pre_idx)
-            simplify_in_one_group(cur_sample_group)
+            simplify_in_one_group(cur_sample_group, np_type)
 
 
 def simplify_in_group_main(filepath: str):

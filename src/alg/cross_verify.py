@@ -7,12 +7,16 @@
 # @Author  : LinYulong
 
 import math
+from enum import EnumMeta
+from typing import Union
 
 import numpy
 import pandas
 
 from src.alg import knn_helper
-from src.train import train_cfg
+from src.alg.medicine_type import DiseaseCheckType
+from src.train import train_cfg, train
+from src.train.confusion_matrix import ConfusionMatrix
 
 
 def single_verify(test_df: pandas.DataFrame, train_df: pandas.DataFrame, fun):
@@ -53,16 +57,19 @@ def cross_verify(verify_cnt: int, df: pandas.DataFrame, fun):
     return ret, ret2
 
 
-def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pandas.DataFrame, fun):
+def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pandas.DataFrame, params, fun):
     """
     n 折交叉验证
     :param verify_cnt: 交叉验证的折数
     :param df_result: 训练用结果
     :param df_feature: 预测用特征
+    :param params: fun 会用到的参数集
     :param fun: 交叉验证时使用的算法执行函数
     :return:
     """
     test_size = math.ceil(df_feature.index.size / verify_cnt)  # 测试集大小
+    real_verify_cnt = 0
+    sum_result = 0
     for i in range(verify_cnt):
         begin_line = 0 + test_size * i
         end_line = begin_line + test_size
@@ -81,21 +88,58 @@ def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
 
         # 转为算法识别类型
         np_test_data_set = numpy.array(test_data_set)
-        np_test_labels = numpy.array(test_labels)
         np_train_data_set = numpy.array(train_data_set)
         np_train_labels = numpy.array(train_labels)
 
         if numpy.size(np_test_data_set) <= 0:
             # n 折计算时， (ceil（total_cnt / n）) * n 可能超过 total_cnt
             print("zero")
-            break
+            continue
+
+        real_verify_cnt += 1
 
         # 使用 XX 算法拟合，得到模型
         knn_k = train_cfg.get_knn_k()
         clf = knn_helper.ski_fit(np_train_data_set, np_train_labels, knn_k)
-        # 计算得到预测分值
-        clf.predict(np_test_data_set)
+        # 计算得到预测分值。注：样本过少，这里预测结果也是个位数
+        np_predict_score: numpy.ndarray = clf.predict(np_test_data_set)
 
         # 预测分值划分成相应的阴阳性
-        
+        df_predict_score = pandas.DataFrame(np_predict_score)
+        df_real_np = train.to_negative_and_positive_table(test_labels)
+        df_predict_np = train.to_negative_and_positive_table(df_predict_score)
+
         # 计算混淆矩阵
+        true_negative = 0  # 真阴性
+        false_negative = 0  # 假阴性
+        true_positive = 0  # 真阳性
+        false_positive = 0  # 假阳性
+        np_real_np = numpy.array(df_real_np)  # 真实阴阳性
+        np_predict_np = numpy.array(df_predict_np)  # 预测阴阳性
+        for predict_idx in range(np_predict_np.size):
+            cur_real_np = np_real_np[predict_idx]
+            cur_predict_np = np_predict_np[predict_idx]
+            if cur_predict_np == DiseaseCheckType.positive.value:
+                if cur_real_np == cur_predict_np:
+                    true_positive += 1
+                else:
+                    false_positive += 1
+            else:
+                if cur_real_np == cur_predict_np:
+                    true_negative += 1
+                else:
+                    false_negative += 1
+
+        cm = ConfusionMatrix()
+        np_type: Union[EnumMeta, DiseaseCheckType] = params
+        #  TODO 用阳性测评者预测时，只看阳性的？
+        if np_type == DiseaseCheckType.positive:
+            tpr = cm.cal_sensitivity(true_positive, false_positive)
+            sum_result += tpr
+        else:
+            tnr = cm.cal_specificity(true_negative, false_positive)
+            sum_result += tnr
+
+    avg_result = (sum_result * 1.0 / real_verify_cnt)
+    return avg_result
+
