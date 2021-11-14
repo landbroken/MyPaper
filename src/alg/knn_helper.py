@@ -46,3 +46,9 @@ def ski_classify(wait_predict: numpy.ndarray, data_set: numpy.ndarray, labels: n
     train_cfg.append_knn_clf_list(clf)
     result = clf.predict(wait_predict)
     return result
+
+
+def ski_fit(data_set: numpy.ndarray, labels: numpy.ndarray, k: int):
+    clf = neighbors.KNeighborsClassifier(k)
+    clf.fit(data_set, labels)
+    return clf

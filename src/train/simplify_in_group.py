@@ -9,9 +9,10 @@
 import numpy
 import pandas
 
+from src.alg import cross_verify
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
-from src.train import train, chd_helper
+from src.train import chd_helper
 
 
 def simplify_in_one_group(df: pandas.DataFrame):
@@ -23,21 +24,21 @@ def simplify_in_one_group(df: pandas.DataFrame):
     # 过滤掉不需要简化的题组。一个题组至少要有两题
     question_size = df.columns.size
     if question_size < 2:
-        group_name = ""  # TODO
-        print(group_name + "group only one question, do not need to simplify")
+        group_first_name = df.columns[0]
+        print(group_first_name + "group only one question, do not need to simplify")
         return
     # 重要性排序
+    df_importance = df  # TODO
     # 选择重要性排名最高的 n 个特征题目
-    for n in range(question_size - 1):
-        pass
-        # x 折交叉验证
-        cross_verify_cnt = 10
-        for x in range(cross_verify_cnt):
-            # train_data, test_data =
-            # 算法拟合
-            # 预测
-            # 预测分值划分成相应的阴阳性
-            # 计算混淆矩阵
+    for n in range(1, question_size):
+        # 注：只用一个题目去预测第二个题目时，那么相当于一个 y = f(x) 函数，一般不应该有特别强的关联性，所以大部分时候，拟合的效果应该非常差
+        # 变成特征题组和得题组
+        df_feature = df_importance.iloc[:, 0:n]
+        df_other = df_importance.iloc[:, n:(n + 1)]
+        for predict_idx in range(n, question_size):
+            # x 折交叉验证
+            cross_verify_cnt = 10
+            cross_verify.cross_verify_2(cross_verify_cnt, df_feature, df_other, None)
             pass
         # 计算平均值作为特征评价指标
 
