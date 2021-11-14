@@ -18,6 +18,27 @@ from src.excel import excel_helper
 from src.train import chd_helper
 
 
+def merge_to_one_columns(df: pandas.DataFrame):
+    """
+    将表格按组合并。
+    :param df:
+    :return:
+    """
+    # 消除原表头和序号
+    np_df = numpy.array(df)
+    df_new = pandas.DataFrame(np_df, columns=df.columns)
+    # 合并
+    line_size = df_new.index.size
+    column_size = df_new.columns.size
+    old_columns = df_new.columns
+    np_zero = numpy.zeros(shape=(line_size, 1), dtype=int)
+    ret = pandas.DataFrame(np_zero, columns=['Group_Score'])
+    for i in range(column_size):
+        old_column_name = old_columns[i]
+        ret["Group_Score"] += df_new[old_column_name]
+    return ret
+
+
 def simplify_in_one_group(df: pandas.DataFrame, np_type: Union[EnumMeta, DiseaseCheckType]):
     """
     单个题组内简化
@@ -36,15 +57,12 @@ def simplify_in_one_group(df: pandas.DataFrame, np_type: Union[EnumMeta, Disease
     # 选择重要性排名最高的 n 个特征题目
     for n in range(1, question_size):
         # 注：只用一个题目去预测第二个题目时，那么相当于一个 y = f(x) 函数，一般不应该有特别强的关联性，所以大部分时候，拟合的效果应该非常差
-        # 变成特征题组和得题组
+        # 筛选特征题组和得题组
         df_feature = df_importance.iloc[:, 0:n]
-        df_other = df_importance.iloc[:, n:(n + 1)]
-        for predict_idx in range(n, question_size):
-            # x 折交叉验证
-            cross_verify_cnt = 10
-            cross_verify.cross_verify_2(cross_verify_cnt, df_feature, df_other, np_type, None)
-            pass
-        # 计算平均值作为特征评价指标
+        df_group = merge_to_one_columns(df_importance)  # 预测的是题组得分
+        # x 折交叉验证
+        cross_verify_cnt = 10
+        cross_verify.cross_verify_2(cross_verify_cnt, df_feature, df_group, np_type, None)
 
 
 def select_tester(np_list, np_type: DiseaseCheckType) -> list[int]:
