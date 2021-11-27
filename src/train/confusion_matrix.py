@@ -14,6 +14,9 @@ class ConfusionMatrix:
     precision_ = 0.0
     recall_ = 0.0
 
+    def __init__(self):
+        self.f_measure_ = 0.0
+
     def set_tpr(self, tpr: float):
         self.tpr_ = tpr
 
@@ -79,6 +82,10 @@ class ConfusionMatrix:
         """
         self.recall_ = tp * 1.0 / (tp + fn)
         return self.recall_
+
+    def cal_f_measure(self, a: int) -> float:
+        self.f_measure_ = (a * a + 1) * self.precision_ * self.recall_ / (a * a * (self.precision_ + self.recall_))
+        return self.f_measure_
 
 
 class ConfusionMatrixHelper:
