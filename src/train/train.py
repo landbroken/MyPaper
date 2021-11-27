@@ -9,6 +9,7 @@ import typing
 
 import numpy
 import pandas
+from sklearn.metrics import mean_squared_error
 
 from src.alg import knn_helper
 from src.alg.medicine_type import DiseaseCheckType
@@ -35,13 +36,14 @@ def column_split(df: pandas.DataFrame, columns_idx: int):
 
 
 def root_mean_square_error(_predict: numpy.ndarray, real: numpy.ndarray):
-    tmp: numpy.ndarray = _predict - real
-    times = train_cfg.get_times()
-    tmp = tmp * 1.0 / times  # 还原实际数量级
-    tmp = tmp ** 2
-    ret: float = tmp.sum()
-    ret = ret * 1.0 / tmp.size
-    ret = ret ** 0.5
+    ret = numpy.sqrt(mean_squared_error(real, _predict))
+    # tmp: numpy.ndarray = _predict - real
+    # times = train_cfg.get_times()
+    # tmp = tmp * 1.0 / times  # 还原实际数量级
+    # tmp = tmp ** 2
+    # ret: float = tmp.sum()
+    # ret = ret * 1.0 / tmp.size
+    # ret = ret ** 0.5
     return ret
 
 
@@ -68,12 +70,27 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
     for columns_idx in range(columns_size):
         test_data_set, test_labels = column_split(test_df, columns_idx)
         train_data_set, train_labels = column_split(train_df, columns_idx)
+
+        test_data_set = test_data_set * train_cfg.get_times()
+        test_data_set = pandas.DataFrame(test_data_set, dtype=int)
+        test_labels = test_labels * train_cfg.get_times()
+        test_labels = pandas.DataFrame(test_labels, dtype=int)
+        train_data_set = train_data_set * train_cfg.get_times()
+        train_data_set = pandas.DataFrame(train_data_set, dtype=int)
+        train_labels = train_labels * train_cfg.get_times()
+        train_labels = pandas.DataFrame(train_labels, dtype=int)
+
         np_test_data_set = numpy.array(test_data_set)
         np_train_data_set = numpy.array(train_data_set)
-        np_train_labels = numpy.array(train_labels)
+        np_train_labels = numpy.array(train_labels).ravel()
+
         knn_k = train_cfg.get_knn_k()
         result = knn_helper.ski_classify(np_test_data_set, np_train_data_set, np_train_labels, knn_k)
         np_test_labels = numpy.array(test_labels)
+
+        result = result / train_cfg.get_times()
+        np_test_labels = np_test_labels / train_cfg.get_times()
+
         # 求偏差，离散程度
         rmse = root_mean_square_error(result, np_test_labels)
         rmse_columns.append(rmse)
