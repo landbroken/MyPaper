@@ -10,6 +10,9 @@
 class ConfusionMatrix:
     tpr_ = 0.0
     tnr_ = 0.0
+    accuracy_ = 0.0
+    precision_ = 0.0
+    recall_ = 0.0
 
     def set_tpr(self, tpr: float):
         self.tpr_ = tpr
@@ -44,6 +47,38 @@ class ConfusionMatrix:
         """
         self.tnr_ = tn / (tn + fp * 1.0)
         return self.tnr_
+
+    def cal_accuracy(self, tn: int, tp: int, fn: int, fp: int) -> float:
+        """
+        准确率计算，在所有样本中，预测正确的概率
+        :param tn:
+        :param tp:
+        :param fn:
+        :param fp:
+        :return:
+        """
+        self.accuracy_ = (tp + tn) * 1.0 / (tp + fn + fp + tn)
+        return self.accuracy_
+
+    def cal_precision(self, tp: int, fp: int) -> float:
+        """
+        精确率，你认为的正样本中，有多少是真的正确的概率
+        :param tp:
+        :param fp:
+        :return:
+        """
+        self.precision_ = tp * 1.0 / (tp + fp)
+        return self.precision_
+
+    def cal_recall(self, tp: int, fn: int) -> float:
+        """
+        召回率 正样本中有多少是被找了出来
+        :param tp:
+        :param fn:
+        :return:
+        """
+        self.recall_ = tp * 1.0 / (tp + fn)
+        return self.recall_
 
 
 class ConfusionMatrixHelper:
