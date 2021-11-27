@@ -60,7 +60,7 @@ def chd_sorted_group_type_get() -> numpy.ndarray:
         [1, 2, 9],
         [3, 4, 5, 6, 7],
     ]
-    return numpy.array(chd_gp)
+    return numpy.array(chd_gp, dtype=object)
 
 
 def sub_df_get(df: pandas.DataFrame, idxs: list) -> pandas.DataFrame:

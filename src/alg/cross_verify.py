@@ -16,7 +16,7 @@ import pandas
 from src.alg import knn_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.train import train_cfg, train
-from src.train.confusion_matrix import ConfusionMatrix
+from src.train.confusion_matrix import ConfusionMatrix, ConfusionMatrixHelper
 
 
 def single_verify(test_df: pandas.DataFrame, train_df: pandas.DataFrame, fun):
@@ -57,9 +57,11 @@ def cross_verify(verify_cnt: int, df: pandas.DataFrame, fun):
     return ret, ret2
 
 
-def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pandas.DataFrame, params, fun):
+def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pandas.DataFrame, merged_columns_size: int,
+                   params, fun):
     """
     n 折交叉验证
+    :param merged_columns_size:
     :param verify_cnt: 交叉验证的折数
     :param df_result: 训练用结果
     :param df_feature: 预测用特征
@@ -69,7 +71,7 @@ def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
     """
     test_size = math.ceil(df_feature.index.size / verify_cnt)  # 测试集大小
     real_verify_cnt = 0
-    sum_result = 0
+    cm_list = []
     for i in range(verify_cnt):
         begin_line = 0 + test_size * i
         end_line = begin_line + test_size
@@ -89,7 +91,7 @@ def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
         # 转为算法识别类型
         np_test_data_set = numpy.array(test_data_set)
         np_train_data_set = numpy.array(train_data_set)
-        np_train_labels = numpy.array(train_labels)
+        np_train_labels = numpy.array(train_labels).ravel()
 
         if numpy.size(np_test_data_set) <= 0:
             # n 折计算时， (ceil（total_cnt / n）) * n 可能超过 total_cnt
@@ -106,8 +108,8 @@ def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
 
         # 预测分值划分成相应的阴阳性
         df_predict_score = pandas.DataFrame(np_predict_score)
-        df_real_np = train.to_negative_and_positive_table(test_labels)
-        df_predict_np = train.to_negative_and_positive_table(df_predict_score)
+        df_real_np = train.to_negative_and_positive_table(test_labels, merged_columns_size)
+        df_predict_np = train.to_negative_and_positive_table(df_predict_score, merged_columns_size)
 
         # 计算混淆矩阵
         true_negative = 0  # 真阴性
@@ -120,26 +122,36 @@ def cross_verify_2(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
             cur_real_np = np_real_np[predict_idx]
             cur_predict_np = np_predict_np[predict_idx]
             if cur_predict_np == DiseaseCheckType.positive.value:
+                # 预测阳性
                 if cur_real_np == cur_predict_np:
+                    # 实际阳性
                     true_positive += 1
                 else:
+                    # 实际阴性
                     false_positive += 1
             else:
+                # 预测阴性
                 if cur_real_np == cur_predict_np:
+                    # 实际阴性
                     true_negative += 1
                 else:
+                    # 实际阳性
                     false_negative += 1
 
         cm = ConfusionMatrix()
-        np_type: Union[EnumMeta, DiseaseCheckType] = params
-        #  TODO 用阳性测评者预测时，只看阳性的？
-        if np_type == DiseaseCheckType.positive:
-            tpr = cm.cal_sensitivity(true_positive, false_positive)
-            sum_result += tpr
+        if (true_positive + false_negative) != 0:
+            cm.cal_sensitivity(true_positive, false_negative)
         else:
-            tnr = cm.cal_specificity(true_negative, false_positive)
-            sum_result += tnr
-
-    avg_result = (sum_result * 1.0 / real_verify_cnt)
-    return avg_result
-
+            # 没有患者时，阳性准确率为 0
+            print("no positive tester")
+            cm.set_tpr(0.0)
+        if (true_negative + false_positive) != 0:
+            cm.cal_specificity(true_negative, false_positive)
+        else:
+            # 没有患者时，阴性准确率为 0
+            print("no negative tester")
+            cm.set_tnr(0.0)
+        cm_list.append(cm)
+    cm_helper = ConfusionMatrixHelper(cm_list)
+    avg_cm = cm_helper.avg()
+    return avg_cm

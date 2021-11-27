@@ -16,6 +16,7 @@ from src.alg import cross_verify
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
 from src.train import chd_helper
+from src.train.confusion_matrix import ConfusionMatrix
 
 
 def merge_to_one_columns(df: pandas.DataFrame):
@@ -59,10 +60,20 @@ def simplify_in_one_group(df: pandas.DataFrame, np_type: Union[EnumMeta, Disease
         # 注：只用一个题目去预测第二个题目时，那么相当于一个 y = f(x) 函数，一般不应该有特别强的关联性，所以大部分时候，拟合的效果应该非常差
         # 筛选特征题组和得题组
         df_feature = df_importance.iloc[:, 0:n]
+        merged_columns_size = df_importance.columns.size
         df_group = merge_to_one_columns(df_importance)  # 预测的是题组得分
         # x 折交叉验证
         cross_verify_cnt = 10
-        cross_verify.cross_verify_2(cross_verify_cnt, df_feature, df_group, np_type, None)
+        avg_ret: ConfusionMatrix = cross_verify.cross_verify_2(cross_verify_cnt, df_feature, df_group,
+                                                               merged_columns_size, np_type, None)
+        if (avg_ret.get_tpr() > 0.8) and (avg_ret.get_tnr() > 0.8):
+            print("can delete question num = " + str(question_size - n))
+        elif avg_ret.get_tpr() > 0.8:
+            print("tnr = " + str(avg_ret.get_tnr()))
+        elif avg_ret.get_tnr() > 0.8:
+            print("tpr = " + str(avg_ret.get_tnr()))
+        else:
+            print("tpr = " + str(avg_ret.get_tpr()) + ", tnr = " + str(avg_ret.get_tnr()))
 
 
 def select_tester(np_list, np_type: DiseaseCheckType) -> list[int]:
@@ -77,6 +88,7 @@ def select_tester(np_list, np_type: DiseaseCheckType) -> list[int]:
     for i in range(np_list_size):
         if np_list[i] == np_type.value:
             ret.append(i)
+            print("select idx = " + str(i))
     return ret
 
 
@@ -119,6 +131,7 @@ def simplify_in_group_with_df(df_origin: pandas.DataFrame):
     for n in range(1, group_size):
         # 获取前置题组
         pre_group = sorted_group_list[n - 1]
+        print("pre_group first name is " + pre_group.columns[0])
         # 获取当前简化题组
         cur_group = sorted_group_list[n]
         # 计算前置题组的阴阳性
@@ -126,6 +139,7 @@ def simplify_in_group_with_df(df_origin: pandas.DataFrame):
         np_type: Union[EnumMeta, DiseaseCheckType]
         for np_type in DiseaseCheckType:
             # 选择前置题组中为阳/阴性的测评者
+            print("select pre tester type = " + np_type.name)
             pre_idx = select_tester(pre_np_list, np_type)
             # 选择这些测评者的当前题组的数据作为实验样本集
             cur_sample_group = get_cur_sample_group(cur_group, pre_idx)

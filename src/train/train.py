@@ -89,20 +89,21 @@ def predict(df_predict: pandas.DataFrame, real_data: pandas.DataFrame, delete_id
     pass
 
 
-def is_negative(score: int) -> int:
-    if score > 2:  # 人为指定的
+def is_negative(score: float) -> int:
+    if score > 2.0:  # 人为指定的
         return DiseaseCheckType.negative.value  # 阴性
     else:
         return DiseaseCheckType.positive.value  # 阳性
 
 
-def to_negative_and_positive_table(df: pandas.DataFrame) -> pandas.DataFrame:
+def to_negative_and_positive_table(df: pandas.DataFrame, merged_columns_size: int = 1) -> pandas.DataFrame:
     """
     原分數表格转为阴阳性表格
     :param df: 原始表格
     :return: 阴阳性表格
     """
-    ret = df.applymap(is_negative)
+    df_float = df * 1.0 / merged_columns_size
+    ret = df_float.applymap(is_negative)
     return ret
 
 
