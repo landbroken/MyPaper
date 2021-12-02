@@ -66,15 +66,17 @@ def chd_sorted_group_type_get() -> numpy.ndarray:
 def sub_df_get(df: pandas.DataFrame, idxs: list) -> pandas.DataFrame:
     line_size = df.index.size
     columns_size = len(idxs)
-    np_zero = numpy.zeros(shape=(line_size, columns_size), dtype=int)
+    np_zero = numpy.zeros(shape=(line_size, columns_size + 1), dtype=int)
     new_columns = []
     for idx in idxs:
         cur_name = "CHD" + str(idx)
         new_columns.append(cur_name)
+    new_columns.append("kind")
     ret = pandas.DataFrame(np_zero, columns=new_columns, dtype=int)
     for idx in idxs:
         cur_name = "CHD" + str(idx)
         ret[cur_name] = df[cur_name]
+    ret["kind"] = df["kind"]
     ret = pandas.DataFrame(ret, dtype=int)
     return ret
 

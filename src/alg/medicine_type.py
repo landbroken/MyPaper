@@ -9,6 +9,6 @@ from enum import Enum
 
 
 class DiseaseCheckType(Enum):
-    positive = 2  # 阳性
+    unknown = 0  # 缺失值
     negative = 1  # 阴性
-
+    positive = 2  # 阳性
