@@ -102,14 +102,9 @@ def simplify_in_one_group(df: pandas.DataFrame):
         # x 折交叉验证
         cross_verify_cnt = 10
         avg_ret: ConfusionMatrix = cross_verify.cross_verify_4(cross_verify_cnt, df_feature, df_labels)
-        if (avg_ret.get_tpr() > 0.8) and (avg_ret.get_tnr() > 0.8):
-            print("can delete question num = " + str(question_size - n))
-        elif avg_ret.get_tpr() > 0.8:
-            print("tnr = " + str(avg_ret.get_tnr()))
-        elif avg_ret.get_tnr() > 0.8:
-            print("tpr = " + str(avg_ret.get_tnr()))
-        else:
-            print("tpr = " + str(avg_ret.get_tpr()) + ", tnr = " + str(avg_ret.get_tnr()))
+        print("|accuracy    = {}|f1 score = {}".format(avg_ret.get_precision(), avg_ret.get_f_measure()))
+        print("|tpr = {}".format(avg_ret.get_tpr()))
+        print("|tnr = {}".format(avg_ret.get_tnr()))
 
 
 def select_tester(np_list, np_type: DiseaseCheckType) -> list[int]:

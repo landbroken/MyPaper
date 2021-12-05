@@ -13,6 +13,7 @@ class ConfusionMatrix:
     accuracy_ = 0.0
     precision_ = 0.0
     recall_ = 0.0
+    f_measure_ = 0.0
 
     def __init__(self):
         self.f_measure_ = 0.0
@@ -28,6 +29,30 @@ class ConfusionMatrix:
 
     def get_tnr(self):
         return self.tnr_
+
+    def set_accuracy(self, accuracy: float):
+        self.accuracy_ = accuracy
+
+    def get_accuracy(self):
+        return self.accuracy_
+
+    def set_precision(self, precision: float):
+        self.precision_ = precision
+
+    def get_precision(self):
+        return self.precision_
+
+    def set_recall(self, recall: float):
+        self.recall_ = recall
+
+    def get_recall(self):
+        return self.recall_
+
+    def set_f_measure(self, f_measure: float):
+        self.f_measure_ = f_measure
+
+    def get_f_measure(self):
+        return self.f_measure_
 
     def cal_sensitivity(self, tp: int, fn: int) -> float:
         """
@@ -111,12 +136,32 @@ class ConfusionMatrixHelper:
         cnt = len(self.cm_list_)
         sum_tpr = 0
         sum_tnr = 0
+        sum_accuracy = 0
+        sum_precision = 0
+        sum_recall = 0
+        sum_f_meature = 0
+
         for item in self.cm_list_:
             sum_tpr += item.get_tpr()
             sum_tnr += item.get_tnr()
+            sum_accuracy += item.get_accuracy()
+            sum_precision += item.get_precision()
+            sum_recall += item.get_recall()
+            sum_f_meature += item.get_f_measure()
+
         avg_tpr = sum_tpr * 1.0 / cnt
         avg_tnr = sum_tnr * 1.0 / cnt
+        avg_accuracy = sum_accuracy * 1.0 / cnt
+        avg_precision = sum_precision * 1.0 / cnt
+        avg_recall = sum_recall * 1.0 / cnt
+        avg_f_meature = sum_f_meature * 1.0 / cnt
+
         ret_cm: ConfusionMatrix = ConfusionMatrix()
         ret_cm.set_tnr(avg_tnr)
         ret_cm.set_tpr(avg_tpr)
+        ret_cm.set_accuracy(avg_accuracy)
+        ret_cm.set_precision(avg_precision)
+        ret_cm.set_recall(avg_recall)
+        ret_cm.set_f_measure(avg_f_meature)
+
         return ret_cm
