@@ -12,7 +12,7 @@ from typing import Union
 import numpy
 import pandas
 
-from src.alg import cross_verify
+from src.alg import cross_verify, decision_tree_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
 from src.train import chd_helper
@@ -51,6 +51,16 @@ def get_df_importance(df: pandas.DataFrame) -> pandas.DataFrame:
     :param df:
     :return:
     """
+    feature = df[
+        [
+            'CHD1', 'CHD2', 'CHD3', 'CHD4', 'CHD5', 'CHD6', 'CHD7', 'CHD8', 'CHD9', 'CHD10',
+            'CHD11', 'CHD12', 'CHD13', 'CHD14'
+        ]
+    ]
+    result = df[['kind']]
+    clf = decision_tree_helper.get_clf(feature, result, "../../output/simplify_no_group.dot")
+    tree_feature = clf.tree_.feature
+
     return df
 
 

@@ -14,6 +14,7 @@ import pandas
 import pandas as pd
 from sklearn.feature_extraction import DictVectorizer
 from sklearn import tree
+from sklearn.tree import DecisionTreeClassifier
 
 
 def get_watermelon_data() -> pandas.DataFrame:
@@ -48,7 +49,6 @@ def get_watermelon_data() -> pandas.DataFrame:
 
 def test_watermelon_decision_tree():
     data = get_watermelon_data()
-    vec = DictVectorizer(sparse=False)
     # sparse=False意思yes不产生稀疏矩阵
     vec = DictVectorizer(sparse=False)
     # 先用 pandas 对每行生成字典，然后进行向量化
@@ -76,6 +76,33 @@ def test_watermelon_decision_tree():
     # 保存成 dot 文件，后面可以用 dot out.dot -T pdf -o out.pdf 转换成图片
     with open("out.dot", 'w') as f:
         f = tree.export_graphviz(clf, out_file=f, feature_names=vec.get_feature_names_out())
+
+
+def get_clf(feature: pandas.DataFrame, result: pandas.DataFrame, filename: str = "out.dot") -> DecisionTreeClassifier:
+    # sparse=False意思yes不产生稀疏矩阵
+    vec = DictVectorizer(sparse=False)
+    # 先用 pandas 对每行生成字典，然后进行向量化
+    dict_feature = feature.to_dict(orient='records')
+    x_train = vec.fit_transform(dict_feature)
+    # 打印各个变量
+    print('show feature\n', feature)
+    print('show vector name\n', vec.get_feature_names_out())
+    print('show vector\n', x_train)
+
+    vec2 = DictVectorizer(sparse=False)
+    y_train = vec2.fit_transform(result.to_dict(orient='records'))
+    print('show result vector name\n', vec2.get_feature_names_out())
+    # print('show result vector\n', y_train)
+
+    # 训练决策树
+    clf = tree.DecisionTreeClassifier(criterion='gini')  # 使用 CART 的 GINI 系数分类
+    clf.fit(x_train, y_train)
+
+    # 保存成 dot 文件，后面可以用 dot out.dot -T pdf -o out.pdf 转换成图片
+    with open(filename, 'w') as f:
+        tree.export_graphviz(clf, out_file=f, feature_names=vec.get_feature_names_out())
+
+    return clf
 
 
 if __name__ == "__main__":
