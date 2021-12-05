@@ -59,9 +59,23 @@ def get_df_importance(df: pandas.DataFrame) -> pandas.DataFrame:
     ]
     result = df[['kind']]
     clf = decision_tree_helper.get_clf(feature, result, "../../output/simplify_no_group.dot")
-    tree_feature = clf.tree_.feature
 
-    return df
+    idxs = [14, 3, 6, 11, 12, 13, 2, 1, 4, 8, 5, 10, 7, 9]
+    line_size = df.index.size
+    columns_size = len(idxs)
+    np_zero = numpy.zeros(shape=(line_size, columns_size + 1), dtype=int)
+    new_columns = []
+    for idx in idxs:
+        cur_name = "CHD" + str(idx)
+        new_columns.append(cur_name)
+    new_columns.append("kind")
+    ret = pandas.DataFrame(np_zero, columns=new_columns, dtype=int)
+    for idx in idxs:
+        cur_name = "CHD" + str(idx)
+        ret[cur_name] = df[cur_name]
+    ret["kind"] = df["kind"]
+    ret = pandas.DataFrame(ret, dtype=int)
+    return ret
 
 
 def simplify_in_one_group(df: pandas.DataFrame):

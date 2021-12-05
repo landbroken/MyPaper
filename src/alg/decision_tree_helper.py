@@ -95,7 +95,7 @@ def get_clf(feature: pandas.DataFrame, result: pandas.DataFrame, filename: str =
     # print('show result vector\n', y_train)
 
     # 训练决策树
-    clf = tree.DecisionTreeClassifier(criterion='gini')  # 使用 CART 的 GINI 系数分类
+    clf = tree.DecisionTreeClassifier(criterion='entropy')  # gini: 使用 CART 的 GINI 系数分类, entropy: 使用信息增益
     clf.fit(x_train, y_train)
 
     # 保存成 dot 文件，后面可以用 dot out.dot -T pdf -o out.pdf 转换成图片
