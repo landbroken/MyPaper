@@ -204,9 +204,100 @@ def cross_verify_3(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
         np_predict_score: numpy.ndarray = clf.predict(np_test_data_set)
 
         # 预测分值划分成相应的阴阳性
-        df_predict_score = pandas.DataFrame(np_predict_score)
-        df_real_np = train.to_negative_and_positive_table(test_labels, merged_columns_size)
-        df_predict_np = train.to_negative_and_positive_table(df_predict_score, merged_columns_size)
+        df_real_np = pandas.DataFrame(test_labels)
+        df_predict_np = pandas.DataFrame(np_predict_score)
+
+        # 计算混淆矩阵
+        true_negative = 0  # 真阴性
+        false_negative = 0  # 假阴性
+        true_positive = 0  # 真阳性
+        false_positive = 0  # 假阳性
+        np_real_np = numpy.array(df_real_np)  # 真实阴阳性
+        np_predict_np = numpy.array(df_predict_np)  # 预测阴阳性
+        for predict_idx in range(np_predict_np.size):
+            cur_real_np = np_real_np[predict_idx]
+            cur_predict_np = np_predict_np[predict_idx]
+            if cur_predict_np == DiseaseCheckType.positive.value:
+                # 预测阳性
+                if cur_real_np == cur_predict_np:
+                    # 实际阳性
+                    true_positive += 1
+                else:
+                    # 实际阴性
+                    false_positive += 1
+            else:
+                # 预测阴性
+                if cur_real_np == cur_predict_np:
+                    # 实际阴性
+                    true_negative += 1
+                else:
+                    # 实际阳性
+                    false_negative += 1
+
+        cm = ConfusionMatrix()
+        if (true_positive + false_negative) != 0:
+            cm.cal_sensitivity(true_positive, false_negative)
+        else:
+            # 没有患者时，阳性准确率为 0
+            print("no positive tester")
+            cm.set_tpr(0.0)
+        if (true_negative + false_positive) != 0:
+            cm.cal_specificity(true_negative, false_positive)
+        else:
+            # 没有患者时，阴性准确率为 0
+            print("no negative tester")
+            cm.set_tnr(0.0)
+        cm_list.append(cm)
+    cm_helper = ConfusionMatrixHelper(cm_list)
+    avg_cm = cm_helper.avg()
+    return avg_cm
+
+
+def cross_verify_4(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pandas.DataFrame):
+    """
+    n 折交叉验证
+    :param verify_cnt: 交叉验证的折数
+    :param df_result: 训练用结果
+    :param df_feature: 预测用特征
+    :return:
+    """
+    test_size = math.ceil(df_feature.index.size / verify_cnt)  # 测试集大小
+    cm_list = []
+    for i in range(verify_cnt):
+        begin_line = 0 + test_size * i
+        end_line = begin_line + test_size
+        # 选择 1 组作为测试集
+        test_data_set = df_feature[begin_line:end_line]
+        test_labels = df_result[begin_line:end_line]
+
+        # 选择 verify_cnt -1 组作为训练集
+        train_df_part1 = df_feature[:begin_line]
+        train_df_part2 = df_feature[end_line:]
+        train_data_set = train_df_part1.append(train_df_part2)
+
+        train_labels_part1 = df_result[:begin_line]
+        train_labels_part2 = df_result[end_line:]
+        train_labels = train_labels_part1.append(train_labels_part2)
+
+        # 转为算法识别类型
+        np_test_data_set = numpy.array(test_data_set)
+        np_train_data_set = numpy.array(train_data_set)
+        np_train_labels = numpy.array(train_labels).ravel()
+
+        if numpy.size(np_test_data_set) <= 0:
+            # n 折计算时， (ceil（total_cnt / n）) * n 可能超过 total_cnt
+            print("zero")
+            continue
+
+        # 使用 XX 算法拟合，得到模型
+        knn_k = train_cfg.get_knn_k()
+        clf = knn_helper.ski_fit(np_train_data_set, np_train_labels, knn_k)
+        # 计算得到预测分值。注：样本过少，这里预测结果也是个位数
+        np_predict_score: numpy.ndarray = clf.predict(np_test_data_set)
+
+        # 预测分值划分成相应的阴阳性
+        df_real_np = pandas.DataFrame(test_labels)
+        df_predict_np = pandas.DataFrame(np_predict_score)
 
         # 计算混淆矩阵
         true_negative = 0  # 真阴性

@@ -38,7 +38,11 @@ class ConfusionMatrix:
         :param fn: 假阴性人数
         :return:tpr
         """
-        self.tpr_ = tp / (tp + fn * 1.0)  # tp rate
+        if (tp + fn) == 0:
+            print("no positive tester")
+            self.tpr_ = 0.0
+        else:
+            self.tpr_ = tp / (tp + fn * 1.0)  # tp rate
         return self.tpr_
 
     def cal_specificity(self, tn: int, fp: int) -> float:
