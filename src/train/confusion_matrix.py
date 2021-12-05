@@ -93,7 +93,11 @@ class ConfusionMatrix:
         :param fp:
         :return:
         """
-        self.accuracy_ = (tp + tn) * 1.0 / (tp + fn + fp + tn)
+        if (tp + fn + fp + tn) != 0:
+            self.accuracy_ = (tp + tn) * 1.0 / (tp + fn + fp + tn)
+        else:
+            self.accuracy_ = 0.0
+
         return self.accuracy_
 
     def cal_precision(self, tp: int, fp: int) -> float:
@@ -103,7 +107,10 @@ class ConfusionMatrix:
         :param fp:
         :return:
         """
-        self.precision_ = tp * 1.0 / (tp + fp)
+        if (tp + fp) != 0:
+            self.precision_ = tp * 1.0 / (tp + fp)
+        else:
+            self.precision_ = 0.0
         return self.precision_
 
     def cal_recall(self, tp: int, fn: int) -> float:
@@ -122,7 +129,10 @@ class ConfusionMatrix:
         :param a:
         :return:
         """
-        self.f_measure_ = (a * a + 1) * self.precision_ * self.recall_ / (a * a * (self.precision_ + self.recall_))
+        if (self.precision_ + self.recall_) != 0:
+            self.f_measure_ = (a * a + 1) * self.precision_ * self.recall_ / (a * a * (self.precision_ + self.recall_))
+        else:
+            self.f_measure_ = 0.0
         return self.f_measure_
 
 
