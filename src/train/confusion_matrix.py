@@ -96,7 +96,8 @@ class ConfusionMatrix:
         if (tp + fn + fp + tn) != 0:
             self.accuracy_ = (tp + tn) * 1.0 / (tp + fn + fp + tn)
         else:
-            self.accuracy_ = 0.0
+            print("no accuracy_")
+            self.accuracy_ = 0.5
 
         return self.accuracy_
 
@@ -110,7 +111,8 @@ class ConfusionMatrix:
         if (tp + fp) != 0:
             self.precision_ = tp * 1.0 / (tp + fp)
         else:
-            self.precision_ = 0.0
+            print("no precision_")
+            self.precision_ = 0.5
         return self.precision_
 
     def cal_recall(self, tp: int, fn: int) -> float:
@@ -132,6 +134,7 @@ class ConfusionMatrix:
         if (self.precision_ + self.recall_) != 0:
             self.f_measure_ = (a * a + 1) * self.precision_ * self.recall_ / (a * a * (self.precision_ + self.recall_))
         else:
+            print("no f_measure_")
             self.f_measure_ = 0.0
         return self.f_measure_
 
