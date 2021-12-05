@@ -45,6 +45,15 @@ def merge_to_one_columns(df: pandas.DataFrame):
     return ret
 
 
+def get_df_importance(df: pandas.DataFrame) -> pandas.DataFrame:
+    """
+    获取重要性排序后的
+    :param df:
+    :return:
+    """
+    return df
+
+
 def simplify_in_one_group(df: pandas.DataFrame):
     """
     单个题组内简化
@@ -58,7 +67,7 @@ def simplify_in_one_group(df: pandas.DataFrame):
         print(group_first_name + "group only one question, do not need to simplify")
         return
     # 重要性排序
-    df_importance = df  # TODO
+    df_importance = get_df_importance(df)
     # 选择重要性排名最高的 n 个特征题目
     for n in range(2, question_size):
         print("cur question is top " + str(n))

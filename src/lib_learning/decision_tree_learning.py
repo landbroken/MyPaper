@@ -35,7 +35,8 @@ data = pd.DataFrame(data_table, columns=data_title)
 vec = DictVectorizer(sparse=False)
 # 先用 pandas 对每行生成字典，然后进行向量化
 feature = data[['season', 'after 8', 'wind']]
-X_train = vec.fit_transform(feature.to_dict(orient='record'))
+dict_feature = feature.to_dict(orient='record')
+X_train = vec.fit_transform(dict_feature)
 # 打印各个变量
 print('show feature\n', feature)
 print('show vector\n', X_train)
