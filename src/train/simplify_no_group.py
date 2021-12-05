@@ -129,8 +129,27 @@ def get_cur_sample_group(df: pandas.DataFrame, pre_idx: list[int]) -> pandas.Dat
     return ret
 
 
+def sub_df_get(df: pandas.DataFrame) -> pandas.DataFrame:
+    line_size = df.index.size
+    columns_size = 14
+    np_zero = numpy.zeros(shape=(line_size, columns_size + 1), dtype=int)
+    new_columns = []
+    for idx in range(1, columns_size + 1):
+        cur_name = "CHD" + str(idx)
+        new_columns.append(cur_name)
+    new_columns.append("kind")
+    ret = pandas.DataFrame(np_zero, columns=new_columns, dtype=int)
+    for idx in range(1, columns_size + 1):
+        cur_name = "CHD" + str(idx)
+        ret[cur_name] = df[cur_name]
+    ret["kind"] = df["kind"]
+    ret = pandas.DataFrame(ret, dtype=int)
+    return ret
+
+
 def simplify_in_group_with_df(df_origin: pandas.DataFrame):
-    simplify_in_one_group(df_origin)
+    df_train = sub_df_get(df_origin)
+    simplify_in_one_group(df_train)
 
 
 def simplify_in_group_main(filepath: str):
