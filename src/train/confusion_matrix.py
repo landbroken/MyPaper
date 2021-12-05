@@ -40,7 +40,7 @@ class ConfusionMatrix:
         """
         if (tp + fn) == 0:
             print("no positive tester")
-            self.tpr_ = 0.0
+            self.tpr_ = 0.5
         else:
             self.tpr_ = tp / (tp + fn * 1.0)  # tp rate
         return self.tpr_
@@ -52,7 +52,11 @@ class ConfusionMatrix:
         :param fp: 假阳性人数
         :return: tnr: 特异性/选择性/真阴性率
         """
-        self.tnr_ = tn / (tn + fp * 1.0)
+        if (tn + fp) == 0:
+            print("no negative tester")
+            self.tnr_ = 0.5
+        else:
+            self.tnr_ = tn / (tn + fp * 1.0)
         return self.tnr_
 
     def cal_accuracy(self, tn: int, tp: int, fn: int, fp: int) -> float:
@@ -84,10 +88,15 @@ class ConfusionMatrix:
         :param fn:
         :return:
         """
-        self.recall_ = tp * 1.0 / (tp + fn)
+        self.recall_ = self.cal_sensitivity(tp, fn)
         return self.recall_
 
     def cal_f_measure(self, a: int) -> float:
+        """
+        https://baike.baidu.com/item/f-measure/913107?fr=aladdin
+        :param a:
+        :return:
+        """
         self.f_measure_ = (a * a + 1) * self.precision_ * self.recall_ / (a * a * (self.precision_ + self.recall_))
         return self.f_measure_
 

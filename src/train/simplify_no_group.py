@@ -98,7 +98,6 @@ def simplify_in_one_group(df: pandas.DataFrame):
         # 注：只用一个题目去预测第二个题目时，那么相当于一个 y = f(x) 函数，一般不应该有特别强的关联性，所以大部分时候，拟合的效果应该非常差
         # 筛选特征题组和得题组
         df_feature = df_importance.iloc[:, 0:n]
-        merged_columns_size = df_importance.columns.size
         df_labels = get_group_result(df_importance)  # 预测的是题组得分
         # x 折交叉验证
         cross_verify_cnt = 10

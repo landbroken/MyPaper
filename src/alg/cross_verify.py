@@ -327,18 +327,13 @@ def cross_verify_4(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
                     false_negative += 1
 
         cm = ConfusionMatrix()
-        if (true_positive + false_negative) != 0:
-            cm.cal_sensitivity(true_positive, false_negative)
-        else:
-            # 没有患者时，阳性准确率为 0
-            print("no positive tester")
-            cm.set_tpr(0.0)
-        if (true_negative + false_positive) != 0:
-            cm.cal_specificity(true_negative, false_positive)
-        else:
-            # 没有患者时，阴性准确率为 0
-            print("no negative tester")
-            cm.set_tnr(0.0)
+        cm.cal_sensitivity(true_positive, false_negative)
+        cm.cal_specificity(true_negative, false_positive)
+        cm.cal_accuracy(true_negative, true_positive, false_negative, false_positive)
+        cm.cal_recall(true_positive, false_negative)
+        cm.cal_precision(true_positive, false_positive)
+        cm.cal_f_measure(1)
+
         cm_list.append(cm)
     cm_helper = ConfusionMatrixHelper(cm_list)
     avg_cm = cm_helper.avg()
