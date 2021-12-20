@@ -11,6 +11,7 @@ import unittest
 import numpy
 import pandas as pd
 
+import src.alg.math_helper
 from src.train import train
 
 
@@ -18,7 +19,7 @@ class MyTestCase(unittest.TestCase):
     def test_root_mean_square_error(self):
         predict = numpy.array([1.0, 2.0, 3.0, 4.0])
         real = numpy.array([2.0, 2.0, 2.0, 2.0])
-        ret = train.root_mean_square_error(predict, real)
+        ret = src.alg.math_helper.root_mean_square_error(predict, real)
         expect = ((1.0 + 0.0 + 1.0 + 4.0) / 4.0) ** 0.5
         self.assertAlmostEqual(ret, expect, delta=0.001)
 

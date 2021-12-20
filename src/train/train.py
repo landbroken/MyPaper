@@ -5,13 +5,12 @@
 #
 # @Time    : 2021/10/10
 # @Author  : LinYulong
-import typing
 
 import numpy
 import pandas
-from sklearn.metrics import mean_squared_error
 
 from src.alg import knn_helper
+from src.alg.math_helper import root_mean_square_error
 from src.alg.medicine_type import DiseaseCheckType
 from src.train import train_cfg
 
@@ -33,18 +32,6 @@ def column_split(df: pandas.DataFrame, columns_idx: int):
     data_set = df_part1.join(df_part2)  # 所有行，除选定列外其它列
     labels = df.iloc[:, columns_idx]  # 所有行，选定列
     return data_set, labels
-
-
-def root_mean_square_error(_predict: numpy.ndarray, real: numpy.ndarray):
-    ret = numpy.sqrt(mean_squared_error(real, _predict))
-    # tmp: numpy.ndarray = _predict - real
-    # times = train_cfg.get_times()
-    # tmp = tmp * 1.0 / times  # 还原实际数量级
-    # tmp = tmp ** 2
-    # ret: float = tmp.sum()
-    # ret = ret * 1.0 / tmp.size
-    # ret = ret ** 0.5
-    return ret
 
 
 def caculate_err_percent(err_arr: numpy.ndarray):

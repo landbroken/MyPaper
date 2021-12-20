@@ -26,6 +26,12 @@ class MyTestCase(unittest.TestCase):
         ret = math_helper.mean_absolute_error(y_true, y_pred)
         self.assertAlmostEqual(ret, 1.9286, delta=0.0001)
 
+    def test_mean_absolute_error_002(self):
+        y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        y_pred = np.array([1.0, 2.0, 3.0, 5.0, 6.0])
+        ret = math_helper.mean_absolute_error(y_true, y_pred)
+        self.assertAlmostEqual(ret, 0.4, delta=0.0001)
+
 
 if __name__ == '__main__':
     unittest.main()
