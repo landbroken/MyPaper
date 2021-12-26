@@ -9,7 +9,7 @@
 import numpy
 import pandas
 
-from src.alg import knn_helper
+from src.alg import knn_helper, math_helper
 from src.alg.math_helper import root_mean_square_error
 from src.alg.medicine_type import DiseaseCheckType
 from src.train import train_cfg
@@ -54,6 +54,12 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
     columns_size = train_df.columns.size
     rmse_columns = []
     err_columns = []
+    r_columns = []
+    r2_columns = []
+    mae_columns = []
+    rmsd_columns = []
+    m_res_columns = []
+    sd_res_columns = []
     for columns_idx in range(columns_size):
         test_data_set, test_labels = column_split(test_df, columns_idx)
         train_data_set, train_labels = column_split(train_df, columns_idx)
@@ -73,10 +79,9 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
 
         knn_k = train_cfg.get_knn_k()
         result = knn_helper.ski_classify(np_test_data_set, np_train_data_set, np_train_labels, knn_k)
-        np_test_labels = numpy.array(test_labels)
 
         result = result / train_cfg.get_times()
-        np_test_labels = np_test_labels / train_cfg.get_times()
+        np_test_labels: numpy.ndarray = numpy.array(test_labels) / train_cfg.get_times()
 
         # 求偏差，离散程度
         rmse = root_mean_square_error(result, np_test_labels)
@@ -84,8 +89,42 @@ def train(test_df: pandas.DataFrame, train_df: pandas.DataFrame):
         # 求绝对误差
         err_single = result - np_test_labels
         err_columns.append(err_single)
+        #
+        r = math_helper.my_pearson_correlation_coefficient(np_test_labels.ravel(), result)
+        r_columns.append(r)
+        #
+        r2 = math_helper.my_pearson_correlation_coefficient(np_test_labels.ravel(), result)
+        r2_columns.append(r2)
+        #
+        mae = math_helper.mean_absolute_error(np_test_labels.ravel(), result)
+        mae_columns.append(mae)
+        #
+        rmsd = math_helper.root_mean_square_error(np_test_labels.ravel(), result)
+        rmsd_columns.append(rmsd)
+        #
+        m_res = math_helper.my_mean_of_residuals(np_test_labels.ravel(), result)
+        m_res_columns.append(m_res)
+        #
+        sd_res = math_helper.my_standard_deviation_of_residuals(np_test_labels.ravel(), result)
+        sd_res_columns.append(sd_res)
     err_arr = numpy.array(err_columns)
     err_percent = caculate_err_percent(err_arr)
+    r_avg = numpy.average(r_columns)
+    print("r avg = " + str(r_avg))
+    r2_arr = numpy.array(r2_columns)
+    print("r2 avg = " + str(numpy.average(r2_arr)))
+    mae_avg = numpy.average(mae_columns)
+    print("mae_avg = " + str(mae_avg))
+
+    rmsd_avg = numpy.average(rmsd_columns)
+    print("rmsd_columns = " + str(rmsd_avg))
+
+    m_res_avg = numpy.average(m_res_columns)
+    print("m_res_columns = " + str(m_res_avg))
+
+    sd_res_avg = numpy.average(sd_res_columns)
+    print("sd_res_columns = " + str(sd_res_avg))
+
     return numpy.array(rmse_columns), err_percent
 
 
