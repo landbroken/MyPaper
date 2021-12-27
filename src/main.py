@@ -177,4 +177,10 @@ train_cfg.set_times(1)
 
 
 if __name__ == "__main__":
+    """
+    预测类型：
+    1. 题目得分
+    2. 阴阳性
+    题目
+    """
     print("main")

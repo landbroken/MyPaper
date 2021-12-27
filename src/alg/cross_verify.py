@@ -17,6 +17,7 @@ from src.alg import knn_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.train import train_cfg, train
 from src.train.confusion_matrix import ConfusionMatrix, ConfusionMatrixHelper
+from src.train.train_result import TrainResult
 
 
 def single_verify(test_df: pandas.DataFrame, train_df: pandas.DataFrame, fun):
@@ -338,3 +339,28 @@ def cross_verify_4(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
     cm_helper = ConfusionMatrixHelper(cm_list)
     avg_cm = cm_helper.avg()
     return avg_cm
+
+
+def cross_verify_no_group_all(verify_cnt: int, df: pandas.DataFrame, fun):
+    """
+    n 折交叉验证
+    :param fun: 交叉验证时使用的算法执行函数
+    :param df: 待验证数据
+    :param verify_cnt: 交叉验证的折数
+    :return:
+    """
+    test_size = math.ceil(df.index.size / verify_cnt)  # 测试集大小
+    train_result = TrainResult()
+    for i in range(verify_cnt):
+        begin_line = 0 + test_size * i
+        end_line = begin_line + test_size
+        # 测试集
+        test_df = df[begin_line:end_line]
+        # 训练集
+        train_df_part1 = df[:begin_line]
+        train_df_part2 = df[end_line:]
+        train_df = train_df_part1.append(train_df_part2)
+        # 执行计算
+        fun(test_df, train_df, train_result)
+
+    return train_result

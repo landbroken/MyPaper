@@ -12,11 +12,12 @@ from typing import Union
 import numpy
 import pandas
 
-from src.alg import cross_verify, decision_tree_helper
+from src.alg import cross_verify, decision_tree_helper, math_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
-from src.train import chd_helper
+from src.train import chd_helper, train_cfg, train, train_bad
 from src.train.confusion_matrix import ConfusionMatrix
+from src.train.train_result import TrainResult
 
 
 def get_group_result(df: pandas.DataFrame):
@@ -43,6 +44,16 @@ def merge_to_one_columns(df: pandas.DataFrame):
         old_column_name = old_columns[i]
         ret["Group_Score"] += df_new[old_column_name]
     return ret
+
+
+def get_df_feature(df: pandas.DataFrame) -> pandas.DataFrame:
+    feature = df[
+        [
+            'CHD1', 'CHD2', 'CHD3', 'CHD4', 'CHD5', 'CHD6', 'CHD7', 'CHD8', 'CHD9', 'CHD10',
+            'CHD11', 'CHD12', 'CHD13', 'CHD14'
+        ]
+    ]
+    return feature
 
 
 def get_df_importance(df: pandas.DataFrame) -> pandas.DataFrame:
@@ -91,20 +102,42 @@ def simplify_in_one_group(df: pandas.DataFrame):
         print(group_first_name + "group only one question, do not need to simplify")
         return
     # 重要性排序
-    df_importance = get_df_importance(df)
+    df_train = get_df_feature(df)
+    # 简化计算表格
+    question_size = df_train.columns.size
+    min_err_percent = 0  # 初始化预测错误率
+    while question_size > 1:
+        if min_err_percent > 0.4:
+            # 错误率过高提前跳出
+            break
+
+        # 当前轮简化
+        cross_verify_times = train_cfg.get_cross_verify_times()
+        result = cross_verify.cross_verify_no_group_all(cross_verify_times, df_train, train_bad.train_no_group_all)
+        print(result)
+        # min_idx = math_helper.min_id(rmse_arr)
+        # min_err_percent = err_percent[min_idx]
+        # print("cur rmse = " + str(rmse_arr[min_idx]) +
+        #       ", cur err percent = " + str(min_err_percent) +
+        #       ", idx = " + str(min_idx))
+        # # 下一轮数据
+        # next_df, min_df = train.column_split(df_train, min_idx)
+        # df_train = next_df
+        # question_size -= 1
+
     # 选择重要性排名最高的 n 个特征题目
-    for n in range(2, question_size):
-        print("cur question is top " + str(n))
-        # 注：只用一个题目去预测第二个题目时，那么相当于一个 y = f(x) 函数，一般不应该有特别强的关联性，所以大部分时候，拟合的效果应该非常差
-        # 筛选特征题组和得题组
-        df_feature = df_importance.iloc[:, 0:n]
-        df_labels = get_group_result(df_importance)  # 预测的是题组得分
-        # x 折交叉验证
-        cross_verify_cnt = 10
-        avg_ret: ConfusionMatrix = cross_verify.cross_verify_4(cross_verify_cnt, df_feature, df_labels)
-        print("|accuracy    = {}|f1 score = {}".format(avg_ret.get_precision(), avg_ret.get_f_measure()))
-        print("|tpr = {}".format(avg_ret.get_tpr()))
-        print("|tnr = {}".format(avg_ret.get_tnr()))
+    # for n in range(2, question_size):
+    #     print("cur question is top " + str(n))
+    #     # 注：只用一个题目去预测第二个题目时，那么相当于一个 y = f(x) 函数，一般不应该有特别强的关联性，所以大部分时候，拟合的效果应该非常差
+    #     # 筛选特征题组和得题组
+    #     df_feature = df_importance.iloc[:, 0:n]
+    #     df_labels = get_group_result(df_importance)  # 预测的是题组得分
+    #     # x 折交叉验证
+    #     cross_verify_cnt = 10
+    #     avg_ret: ConfusionMatrix = cross_verify.cross_verify_4(cross_verify_cnt, df_feature, df_labels)
+    #     print("|accuracy    = {}|f1 score = {}".format(avg_ret.get_precision(), avg_ret.get_f_measure()))
+    #     print("|tpr = {}".format(avg_ret.get_tpr()))
+    #     print("|tnr = {}".format(avg_ret.get_tnr()))
 
 
 def select_tester(np_list, np_type: DiseaseCheckType) -> list[int]:
@@ -188,6 +221,9 @@ if __name__ == "__main__":
     """
     简化：
     1.无题组
-    2.预测阴阳性
+    2.预测题目得分
+    3.最终同时预测阴阳性
     """
+    train_cfg.set_times(1)
+    train_cfg.set_cross_verify_times(10)  # 10 折交叉验证
     simplify_in_group_main("/CHD.xlsx")
