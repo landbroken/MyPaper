@@ -58,8 +58,8 @@ def train_no_group_all(test_df: pandas.DataFrame, train_df: pandas.DataFrame, la
 
         test_data_set = test_data_set * cfg_train_times
         test_data_set = pandas.DataFrame(test_data_set, dtype=int)
-        test_labels = test_labels * cfg_train_times
-        test_labels = pandas.DataFrame(test_labels, dtype=int)
+        test_labels_times = test_labels * cfg_train_times
+        test_labels_times = pandas.DataFrame(test_labels_times, dtype=int)
         train_data_set = train_data_set * cfg_train_times
         train_data_set = pandas.DataFrame(train_data_set, dtype=int)
         train_labels = train_labels * cfg_train_times
@@ -68,10 +68,10 @@ def train_no_group_all(test_df: pandas.DataFrame, train_df: pandas.DataFrame, la
         np_test_data_set = numpy.array(test_data_set)
         np_train_data_set = numpy.array(train_data_set)
         np_train_labels = numpy.array(train_labels).ravel()
+        np_test_labels: numpy.ndarray = numpy.array(test_labels)
 
         # 预测
         y_predict = train_predict(np_test_data_set, np_train_data_set, np_train_labels)
-        np_test_labels: numpy.ndarray = numpy.array(test_labels) / train_cfg.get_times()
 
         # 性能度量
         last_result.append_single_result(y_predict, np_test_labels)

@@ -32,6 +32,18 @@ class MyTestCase(unittest.TestCase):
         ret = math_helper.mean_absolute_error(y_true, y_pred)
         self.assertAlmostEqual(ret, 0.4, delta=0.0001)
 
+    def test_my_pearson_correlation_coefficient(self):
+        y_true = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+        y_pred = np.array([0.1, 5.2, 1.5, 2.3, 5.6])
+        ret = math_helper.my_pearson_correlation_coefficient(y_true, y_pred)
+        self.assertIsNotNone(ret)
+
+    def test_my_coefficient_of_correlation(self):
+        y_true = np.array([12.5, 15.3, 23.2, 26.4, 33.5, 34.4, 39.4, 45.2, 55.4, 60.9])
+        y_pred = np.array([21.2, 23.9, 32.9, 34.1, 42.5, 43.2, 49.0, 52.8, 59.4, 63.5])
+        ret = math_helper.my_coefficient_of_correlation(y_true, y_pred)
+        self.assertAlmostEqual(ret, 0.9942, delta=0.0001)
+
 
 if __name__ == '__main__':
     unittest.main()

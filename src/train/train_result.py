@@ -31,22 +31,22 @@ class TrainResult:
         err_single = y_predict - y_test_labels
         self.err_columns_.append(err_single)
         #
-        r = math_helper.my_pearson_correlation_coefficient(y_test_labels.ravel(), y_predict)
+        r = math_helper.my_pearson_correlation_coefficient(y_test_labels, y_predict)
         self.r_columns_.append(r)
         #
-        r2 = math_helper.my_pearson_correlation_coefficient(y_test_labels.ravel(), y_predict)
+        r2 = math_helper.my_pearson_correlation_coefficient_square(y_test_labels, y_predict)
         self.r2_columns_.append(r2)
         #
-        mae = math_helper.mean_absolute_error(y_test_labels.ravel(), y_predict)
+        mae = math_helper.mean_absolute_error(y_test_labels, y_predict)
         self.mae_columns_.append(mae)
         #
-        rmsd = math_helper.root_mean_square_error(y_test_labels.ravel(), y_predict)
+        rmsd = math_helper.root_mean_square_error(y_test_labels, y_predict)
         self.rmsd_columns_.append(rmsd)
         #
-        m_res = math_helper.my_mean_of_residuals(y_test_labels.ravel(), y_predict)
+        m_res = math_helper.my_mean_of_residuals(y_test_labels, y_predict)
         self.m_res_columns_.append(m_res)
         #
-        sd_res = math_helper.my_standard_deviation_of_residuals(y_test_labels.ravel(), y_predict)
+        sd_res = math_helper.my_standard_deviation_of_residuals(y_test_labels, y_predict)
         self.sd_res_columns_.append(sd_res)
 
     def print_average_result(self):

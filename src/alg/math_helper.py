@@ -71,12 +71,55 @@ def my_pearson_correlation_coefficient(y_true: numpy.ndarray, y_pred: numpy.ndar
     :return:
     """
     pccs = numpy.corrcoef(y_true, y_pred)
-    return pccs
+    ret = pccs[0][1]
+    return ret
+
+
+def my_pearson_correlation_coefficient_square(y_true: numpy.ndarray, y_pred: numpy.ndarray):
+    """
+    皮尔逊相关系数
+    https://blog.csdn.net/qq_40260867/article/details/90667462
+    :param y_true:
+    :param y_pred:
+    :return:
+    """
+    pccs = numpy.corrcoef(y_true, y_pred)
+    tmp = pccs[0][1]
+    ret = tmp * tmp
+    return ret
+
+
+def my_coefficient_of_correlation(y_true: numpy.ndarray, y_pred: numpy.ndarray):
+    """
+    相关系数
+    https://baike.baidu.com/item/%E7%9B%B8%E5%85%B3%E7%B3%BB%E6%95%B0/3109424?fr=aladdin
+    https://numpy.org/doc/stable/reference/generated/numpy.nanvar.html
+    https://zhuanlan.zhihu.com/p/37609917
+    https://blog.csdn.net/ybdesire/article/details/6270328?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.pc_relevant_paycolumn_v2&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.pc_relevant_paycolumn_v2&utm_relevant_index=2
+    https://zhuanlan.zhihu.com/p/34380674
+    :param y_true:
+    :param y_pred:
+    :return:
+    """
+    cov_x = numpy.stack((y_true, y_pred), axis=0)
+    '''
+    -- 0       , 1
+    0: cov(a,a), cov(a,b)
+    1: cov(b,a), cov(b,b)
+    '''
+    np_cov = numpy.cov(cov_x)
+    # var（）函数默认计算总体方差。要计算样本的方差，必须将 ddof 参数设置为值1。
+    var_true = numpy.var(y_true, ddof=1)
+    var_predict = numpy.var(y_pred, ddof=1)
+    ret_matrix = np_cov / ((var_true * var_predict) ** 0.5)
+    ret = ret_matrix[0][1]
+    return ret
 
 
 def my_mean_of_residuals(y_true: numpy.ndarray, y_pred: numpy.ndarray):
     residuals = y_pred - y_true
-    ret = residuals * 1.0 / len(y_true)
+    tmp = residuals * 1.0 / len(y_true)
+    ret = numpy.mean(tmp)
     return ret
 
 
