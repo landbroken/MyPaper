@@ -13,15 +13,30 @@ from src.alg import knn_helper, math_helper
 from src.train import train_cfg
 from src.train.train import column_split
 from src.train.train_result import TrainResult
+from sklearn import preprocessing
+
+
+def get_encoded_train_labels(np_train_labels: numpy.ndarray):
+    le = preprocessing.LabelEncoder()
+    le.fit(np_train_labels)
+    # 可以查看一下 fit 以后的类别是什么
+    # le_type = le.classes_
+    # transform 以后，这一列数就变成了 [0,  n-1] 这个区间的数，即是  le.classes_ 中的索引
+    encoded_train_labels = le.transform(np_train_labels)
+    return encoded_train_labels
 
 
 def train_predict(np_test_data_set: numpy.ndarray, np_train_data_set: numpy.ndarray,
                   np_train_labels: numpy.ndarray) -> numpy.ndarray:
-    model = XGBClassifier()  # 载入模型（模型命名为model)
-    model.fit(np_train_data_set, np_train_labels)  # 训练模型（训练集）
+    # 因为 XGBClassifier 告警要有 use_label_encoder=False，所以需要这个预处理
+    encoded_train_labels = get_encoded_train_labels(np_train_labels)
+    model = XGBClassifier(use_label_encoder=False)  # 载入模型（模型命名为model)
+    model.fit(np_train_data_set, encoded_train_labels)  # 训练模型（训练集）
     y_predict = model.predict(np_test_data_set)  # 模型预测（测试集），y_pred为预测结果
 
-    y_predict = y_predict / train_cfg.get_times()
+    cfg_train_times = train_cfg.get_times()
+    offset = 1  # 偏移，因为预处理的 labels 一定是 0,...n-1。所以要加偏移才是实际分数
+    y_predict = y_predict / cfg_train_times + offset
     return y_predict
 
 
@@ -63,6 +78,5 @@ def train_no_group_all(test_df: pandas.DataFrame, train_df: pandas.DataFrame, la
 
     # err_arr = numpy.array(err_columns)
     # err_percent = caculate_err_percent(err_arr)
-
 
     return numpy.array(rmse_columns)

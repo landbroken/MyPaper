@@ -16,8 +16,8 @@ from src.alg import cross_verify, decision_tree_helper, math_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
 from src.train import chd_helper, train_cfg, train, train_bad
-from src.train.confusion_matrix import ConfusionMatrix
-from src.train.train_result import TrainResult
+# from src.train.confusion_matrix import ConfusionMatrix
+# from src.train.train_result import TrainResult
 
 
 def get_group_result(df: pandas.DataFrame):
