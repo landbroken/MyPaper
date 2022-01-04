@@ -42,14 +42,6 @@ def train_predict(np_test_data_set: numpy.ndarray, np_train_data_set: numpy.ndar
 
 def train_no_group_all(test_df: pandas.DataFrame, train_df: pandas.DataFrame, last_result: TrainResult):
     columns_size = train_df.columns.size
-    rmse_columns = []
-    err_columns = []
-    r_columns = []
-    r2_columns = []
-    mae_columns = []
-    rmsd_columns = []
-    m_res_columns = []
-    sd_res_columns = []
     cfg_train_times = train_cfg.get_times()
     for columns_idx in range(columns_size):
         # 去掉被预测列
@@ -76,7 +68,4 @@ def train_no_group_all(test_df: pandas.DataFrame, train_df: pandas.DataFrame, la
         # 性能度量
         last_result.append_single_result(y_predict, np_test_labels)
 
-    # err_arr = numpy.array(err_columns)
-    # err_percent = caculate_err_percent(err_arr)
-
-    return numpy.array(rmse_columns)
+    return last_result

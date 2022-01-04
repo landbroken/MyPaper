@@ -6,6 +6,7 @@
 # @Time    : 2021/12/26
 # @Author  : LinYulong
 import numpy
+from sklearn.metrics import accuracy_score  # 准确率
 
 from src.alg import math_helper
 
@@ -19,6 +20,7 @@ class TrainResult:
     rmsd_columns_ = []
     m_res_columns_ = []
     sd_res_columns_ = []
+    accuracy_columns_ = []
 
     def __init__(self):
         pass
@@ -48,6 +50,9 @@ class TrainResult:
         #
         sd_res = math_helper.my_standard_deviation_of_residuals(y_test_labels, y_predict)
         self.sd_res_columns_.append(sd_res)
+        #
+        accuracy = accuracy_score(y_test_labels, y_predict)
+        self.accuracy_columns_.append(accuracy)
 
     def print_average_result(self):
         r_avg = numpy.average(self.r_columns_)
@@ -65,3 +70,6 @@ class TrainResult:
 
         sd_res_avg = numpy.average(self.sd_res_columns_)
         print("sd_res_columns = " + str(sd_res_avg))
+
+        accuracy_avg = numpy.average(self.accuracy_columns_)
+        print("accuracy_avg = " + str(accuracy_avg))
