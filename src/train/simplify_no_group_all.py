@@ -106,33 +106,23 @@ def simplify_in_one_group(df: pandas.DataFrame):
     df_train = chd_get_df_feature(df)
     # 简化计算表格
     question_size = df_train.columns.size
-    min_err_percent = 0  # 初始化预测错误率
+    finish_param = 0  # 初始化预测错误率
+    cur_df = df_train
     for idx in range(0, question_size - 1):
         print("begin idx = " + str(idx))
-        if min_err_percent > 0.5:
+        # 当前轮简化
+        last_result: TrainResult = train_bad.train_no_group_all(cur_df)
+        # 下一轮数据
+        next_df, min_df = train.column_split(cur_df, last_result.get_id())
+        cur_df = next_df
+        print("--- end idx = {} ---".format(idx))
+        finish_param = last_result.get_avg_r2()
+        if finish_param < 0.4:
             # 错误率过高提前跳出
             break
 
-        # 当前轮简化
-        last_result: TrainResult = train_bad.train_no_group_all(df_train)
-        # # 下一轮数据
-        next_df, min_df = train.column_split(df_train, last_result.get_id())
-        df_train = next_df
-        print("--- end idx = {} ---".format(idx))
-
-    # 选择重要性排名最高的 n 个特征题目
-    # for n in range(2, question_size):
-    #     print("cur question is top " + str(n))
-    #     # 注：只用一个题目去预测第二个题目时，那么相当于一个 y = f(x) 函数，一般不应该有特别强的关联性，所以大部分时候，拟合的效果应该非常差
-    #     # 筛选特征题组和得题组
-    #     df_feature = df_importance.iloc[:, 0:n]
-    #     df_labels = get_group_result(df_importance)  # 预测的是题组得分
-    #     # x 折交叉验证
-    #     cross_verify_cnt = 10
-    #     avg_ret: ConfusionMatrix = cross_verify.cross_verify_4(cross_verify_cnt, df_feature, df_labels)
-    #     print("|accuracy    = {}|f1 score = {}".format(avg_ret.get_precision(), avg_ret.get_f_measure()))
-    #     print("|tpr = {}".format(avg_ret.get_tpr()))
-    #     print("|tnr = {}".format(avg_ret.get_tnr()))
+        # 用当前轮剩余数据，一直预测到全部题组，并打印过程偏差
+    print("=== end simplify in one group ===")
 
 
 def select_tester(np_list, np_type: DiseaseCheckType) -> list[int]:
