@@ -87,7 +87,7 @@ def get_best_result(result_list: list):
         if tmp_result.get_avg_r2() > ret_result.get_avg_r2():
             ret_result = tmp_result
             best_i = i
-    print("best result idx = " + str(best_i))
+    print("best result idx = " + str(ret_result.get_id()))
     return ret_result
 
 
@@ -107,6 +107,7 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
         cross_verify_times = train_cfg.get_cross_verify_times()
         result: TrainResult = cross_verify.cross_verify_no_group_all(cross_verify_times, test_data_set,
                                                                      test_labels_times, train_predict_xgb_regressor)
+        result.set_id(columns_idx)
         result_list.append(result)
 
     print("------------------------------")

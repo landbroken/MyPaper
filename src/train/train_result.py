@@ -13,6 +13,7 @@ from src.alg import math_helper
 
 class TrainResult:
     def __init__(self):
+        self.id_: int = 0  # 结果所属数据标识
         self.rmse_columns_ = []
         self.err_columns_ = []
         self.r_columns_ = []
@@ -23,6 +24,12 @@ class TrainResult:
         self.m_res_columns_ = []
         self.sd_res_columns_ = []
         self.accuracy_columns_ = []
+
+    def set_id(self, data_id: int):
+        self.id_ = data_id
+
+    def get_id(self) -> int:
+        return self.id_
 
     def append_single_result(self, y_predict: numpy.ndarray, y_test_labels: numpy.ndarray):
         # 求偏差，离散程度
@@ -58,8 +65,10 @@ class TrainResult:
     def print_average_result(self):
         r_avg = numpy.average(self.r_columns_)
         print("r avg = " + str(r_avg))
+
         r2_avg = self.get_avg_r2()
         print("r2 avg = " + str(r2_avg))
+
         mae_avg = numpy.average(self.mae_columns_)
         print("mae_avg = " + str(mae_avg))
 

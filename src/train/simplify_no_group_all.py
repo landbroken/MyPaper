@@ -13,7 +13,8 @@ import pandas
 from src.alg import decision_tree_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
-from src.train import train_cfg, train_bad
+from src.train import train_cfg, train_bad, train
+from src.train.train_result import TrainResult
 
 
 def get_group_result(df: pandas.DataFrame):
@@ -113,17 +114,11 @@ def simplify_in_one_group(df: pandas.DataFrame):
             break
 
         # 当前轮简化
-        train_bad.train_no_group_all(df_train)
-        print("end idx = " + str(idx))
-        # min_idx = math_helper.min_id(rmse_arr)
-        # min_err_percent = err_percent[min_idx]
-        # print("cur rmse = " + str(rmse_arr[min_idx]) +
-        #       ", cur err percent = " + str(min_err_percent) +
-        #       ", idx = " + str(min_idx))
+        last_result: TrainResult = train_bad.train_no_group_all(df_train)
         # # 下一轮数据
-        # next_df, min_df = train.column_split(df_train, min_idx)
-        # df_train = next_df
-        # question_size -= 1
+        next_df, min_df = train.column_split(df_train, last_result.get_id())
+        df_train = next_df
+        print("--- end idx = {} ---".format(idx))
 
     # 选择重要性排名最高的 n 个特征题目
     # for n in range(2, question_size):
