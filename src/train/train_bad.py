@@ -79,14 +79,24 @@ def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
     return y_predict
 
 
+def get_best_result(result_list: list):
+    best_i = 0
+    ret_result: TrainResult = result_list[best_i]
+    for i in range(0, len(result_list)):
+        tmp_result: TrainResult = result_list[i]
+        if tmp_result.get_avg_r2() > ret_result.get_avg_r2():
+            ret_result = tmp_result
+            best_i = i
+    print("best result idx = " + str(best_i))
+    return ret_result
+
+
 def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
     columns_size = test_df.columns.size
     cfg_train_times = train_cfg.get_times()
     result_list = []
     for columns_idx in range(columns_size):
         # 去掉被预测列
-        print("------------------------------")
-        print("predict columns idx = " + str(columns_idx))
         test_data_set, test_labels = column_split(test_df, columns_idx)
 
         test_data_set = test_data_set * cfg_train_times
@@ -98,5 +108,9 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
         result: TrainResult = cross_verify.cross_verify_no_group_all(cross_verify_times, test_data_set,
                                                                      test_labels_times, train_predict_xgb_regressor)
         result_list.append(result)
-        print("----------end idx = " + str(columns_idx) + "--------------------")
-    return result_list[0]
+
+    print("------------------------------")
+    ret_result = get_best_result(result_list)
+    ret_result.print_average_result()
+    print("------------------------------")
+    return ret_result

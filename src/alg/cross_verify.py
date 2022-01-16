@@ -380,5 +380,4 @@ def cross_verify_no_group_all(verify_cnt: int, train_data: pandas.DataFrame, tes
         # 性能度量
         train_result.append_single_result(y_predict, y_test)
 
-    train_result.print_average_result()
     return train_result

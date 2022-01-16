@@ -12,18 +12,17 @@ from src.alg import math_helper
 
 
 class TrainResult:
-    rmse_columns_ = []
-    err_columns_ = []
-    r_columns_ = []
-    r2_columns_ = []
-    mae_columns_ = []
-    rmsd_columns_ = []
-    m_res_columns_ = []
-    sd_res_columns_ = []
-    accuracy_columns_ = []
-
     def __init__(self):
-        pass
+        self.rmse_columns_ = []
+        self.err_columns_ = []
+        self.r_columns_ = []
+        self.r2_columns_ = []
+        self.r2_avg_ = 0.0
+        self.mae_columns_ = []
+        self.rmsd_columns_ = []
+        self.m_res_columns_ = []
+        self.sd_res_columns_ = []
+        self.accuracy_columns_ = []
 
     def append_single_result(self, y_predict: numpy.ndarray, y_test_labels: numpy.ndarray):
         # 求偏差，离散程度
@@ -59,8 +58,8 @@ class TrainResult:
     def print_average_result(self):
         r_avg = numpy.average(self.r_columns_)
         print("r avg = " + str(r_avg))
-        r2_arr = numpy.array(self.r2_columns_)
-        print("r2 avg = " + str(numpy.average(r2_arr)))
+        r2_avg = self.get_avg_r2()
+        print("r2 avg = " + str(r2_avg))
         mae_avg = numpy.average(self.mae_columns_)
         print("mae_avg = " + str(mae_avg))
 
@@ -75,3 +74,8 @@ class TrainResult:
 
         accuracy_avg = numpy.average(self.accuracy_columns_)
         print("accuracy_avg = " + str(accuracy_avg))
+
+    def get_avg_r2(self):
+        r2_arr = numpy.array(self.r2_columns_)
+        self.r2_avg_ = numpy.average(r2_arr)
+        return self.r2_avg_
