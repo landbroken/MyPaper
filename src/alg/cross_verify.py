@@ -375,7 +375,8 @@ def cross_verify_no_group_all(verify_cnt: int, train_data: pandas.DataFrame, tes
         y_test = numpy.array(y_test_df).ravel()
 
         # 预测
-        y_predict = fun(x_test, x_train, y_train)
+        y_predict, model = fun(x_test, x_train, y_train)
+        train_result.set_model(model)
 
         # 性能度量
         train_result.append_single_result(y_predict, y_test)

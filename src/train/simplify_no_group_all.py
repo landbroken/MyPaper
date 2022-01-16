@@ -106,22 +106,28 @@ def simplify_in_one_group(df: pandas.DataFrame):
     df_train = chd_get_df_feature(df)
     # 简化计算表格
     question_size = df_train.columns.size
-    finish_param = 0  # 初始化预测错误率
     cur_df = df_train
+    train_result_list = []
     for idx in range(0, question_size - 1):
         print("begin idx = " + str(idx))
         # 当前轮简化
         last_result: TrainResult = train_bad.train_no_group_all(cur_df)
+        train_result_list.append(last_result)
         # 下一轮数据
         next_df, min_df = train.column_split(cur_df, last_result.get_id())
         cur_df = next_df
         print("--- end idx = {} ---".format(idx))
+        # 提前跳出
         finish_param = last_result.get_avg_r2()
         if finish_param < 0.4:
             # 错误率过高提前跳出
             break
 
         # 用当前轮剩余数据，一直预测到全部题组，并打印过程偏差
+        if idx == 0:
+            continue  # 跳过第一次
+        train_bad.train_no_group_all_predict(cur_df, df_train, train_result_list)
+
     print("=== end simplify in one group ===")
 
 

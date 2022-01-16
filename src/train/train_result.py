@@ -5,14 +5,18 @@
 #
 # @Time    : 2021/12/26
 # @Author  : LinYulong
+from typing import Optional, Union
+
 import numpy
 from sklearn.metrics import accuracy_score  # 准确率
+from xgboost import XGBModel, XGBClassifier, XGBRegressor
 
 from src.alg import math_helper
 
 
 class TrainResult:
     def __init__(self):
+        self.model_: Optional[Union[XGBClassifier, XGBRegressor]] = None  # 训练用模型
         self.id_: int = 0  # 结果所属数据标识
         self.rmse_columns_ = []
         self.err_columns_ = []
@@ -24,6 +28,12 @@ class TrainResult:
         self.m_res_columns_ = []
         self.sd_res_columns_ = []
         self.accuracy_columns_ = []
+
+    def set_model(self, model: Union[XGBClassifier, XGBRegressor]):
+        self.model_ = model
+
+    def get_model(self) -> Optional[Union[XGBClassifier, XGBRegressor]]:
+        return self.model_
 
     def set_id(self, data_id: int):
         self.id_ = data_id

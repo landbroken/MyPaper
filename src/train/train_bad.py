@@ -5,6 +5,7 @@
 #
 # @Time    : 2021/10/31
 # @Author  : LinYulong
+
 import numpy
 import pandas
 import xgboost
@@ -28,7 +29,7 @@ def get_encoded_train_labels(np_train_labels: numpy.ndarray):
 
 
 def train_predict_xgb_classifier(x_test: numpy.ndarray, x_train: numpy.ndarray,
-                                 y_train: numpy.ndarray) -> numpy.ndarray:
+                                 y_train: numpy.ndarray):
     # 因为 XGBClassifier 告警要有 use_label_encoder=False，所以需要这个预处理
     encoded_y_train = get_encoded_train_labels(y_train)
     """
@@ -44,11 +45,11 @@ def train_predict_xgb_classifier(x_test: numpy.ndarray, x_train: numpy.ndarray,
     cfg_train_times = train_cfg.get_times()
     offset = 1  # 偏移，因为预处理的 labels 一定是 0,...n-1。所以要加偏移才是实际分数
     y_predict = y_predict / cfg_train_times + offset
-    return y_predict
+    return y_predict, model
 
 
 def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
-                                y_train: numpy.ndarray) -> numpy.ndarray:
+                                y_train: numpy.ndarray):
     # 因为 XGBClassifier 告警要有 use_label_encoder=False，所以需要这个预处理
     encoded_y_train = get_encoded_train_labels(y_train)
     """
@@ -76,7 +77,7 @@ def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
     cfg_train_times = train_cfg.get_times()
     offset = 1  # 偏移，因为预处理的 labels 一定是 0,...n-1。所以要加偏移才是实际分数
     y_predict = y_predict / cfg_train_times + offset
-    return y_predict
+    return y_predict, model_r
 
 
 def get_best_result(result_list: list):
@@ -115,3 +116,27 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
     ret_result.print_average_result()
     print("------------------------------")
     return ret_result
+
+
+def train_no_group_all_predict(begin_df: pandas.DataFrame, origin_df: pandas.DataFrame, train_result_list: list):
+    for idx in range(len(train_result_list) - 1, 0):
+        x_test = begin_df
+        cur_old_train_result: TrainResult = train_result_list[idx]
+        model = cur_old_train_result.get_model()
+        old_id = cur_old_train_result.get_id()
+        if model is None:
+            print("model is None")
+            raise Exception("model is None" + str(old_id))
+
+        test_data_set, y_test = column_split(origin_df, old_id)
+
+        y_predict = model.predict(x_test)  # 模型预测（测试集），y_pred为预测结果
+        cfg_train_times = train_cfg.get_times()
+        offset = 1  # 偏移，因为预处理的 labels 一定是 0,...n-1。所以要加偏移才是实际分数
+        y_predict = y_predict / cfg_train_times + offset
+
+        cur_new_train_result = TrainResult()
+        cur_new_train_result.append_single_result(y_predict, y_test)
+        cur_new_train_result.print_average_result()
+
+        # 下一轮数据
