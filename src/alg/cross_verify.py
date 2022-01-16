@@ -342,12 +342,13 @@ def cross_verify_4(verify_cnt: int, df_feature: pandas.DataFrame, df_result: pan
     return avg_cm
 
 
-def cross_verify_no_group_all(verify_cnt: int, train_data: pandas.DataFrame, test_label: pandas.DataFrame):
+def cross_verify_no_group_all(verify_cnt: int, train_data: pandas.DataFrame, test_label: pandas.DataFrame, fun):
     """
     n 折交叉验证
     :param verify_cnt: 交叉验证的折数
     :param train_data: 训练数据
     :param test_label: 训练数据标签
+    :param fun: 训练函数
     :return:
     """
     test_size = math.ceil(test_label.index.size / verify_cnt)  # 测试集大小
@@ -375,7 +376,7 @@ def cross_verify_no_group_all(verify_cnt: int, train_data: pandas.DataFrame, tes
         y_test = numpy.array(y_test_df).ravel()
 
         # 预测
-        y_predict = train_predict(x_test, x_train, y_train)
+        y_predict = fun(x_test, x_train, y_train)
 
         # 性能度量
         train_result.append_single_result(y_predict, y_test)

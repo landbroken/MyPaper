@@ -7,6 +7,7 @@
 # @Author  : LinYulong
 import numpy
 import pandas
+import xgboost
 from xgboost import XGBClassifier
 
 from src.alg import cross_verify
@@ -26,13 +27,51 @@ def get_encoded_train_labels(np_train_labels: numpy.ndarray):
     return encoded_train_labels
 
 
-def train_predict(x_test: numpy.ndarray, x_train: numpy.ndarray,
-                  y_train: numpy.ndarray) -> numpy.ndarray:
+def train_predict_xgb_classifier(x_test: numpy.ndarray, x_train: numpy.ndarray,
+                                 y_train: numpy.ndarray) -> numpy.ndarray:
     # 因为 XGBClassifier 告警要有 use_label_encoder=False，所以需要这个预处理
     encoded_y_train = get_encoded_train_labels(y_train)
-    model = XGBClassifier(use_label_encoder=False, eval_metric='rmse')  # 载入模型（模型命名为model)
+    """
+    https://blog.csdn.net/qq_38735017/article/details/111203258
+    eval_metric
+    回归 rmse, mae
+    分类 auc, error, merror, logloss, mlogloss
+    """
+    model = XGBClassifier(use_label_encoder=False, eval_metric='merror')  # 载入模型（模型命名为model)
     model.fit(x_train, encoded_y_train)  # 训练模型（训练集）
     y_predict = model.predict(x_test)  # 模型预测（测试集），y_pred为预测结果
+
+    cfg_train_times = train_cfg.get_times()
+    offset = 1  # 偏移，因为预处理的 labels 一定是 0,...n-1。所以要加偏移才是实际分数
+    y_predict = y_predict / cfg_train_times + offset
+    return y_predict
+
+
+def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
+                                y_train: numpy.ndarray) -> numpy.ndarray:
+    # 因为 XGBClassifier 告警要有 use_label_encoder=False，所以需要这个预处理
+    encoded_y_train = get_encoded_train_labels(y_train)
+    """
+    https://blog.csdn.net/qq_38735017/article/details/111203258
+    eval_metric
+    回归 rmse, mae
+    分类 auc, error, merror, logloss, mlogloss
+    """
+    model_r = xgboost.XGBRegressor(max_depth=3,
+                                   learning_rate=0.1,
+                                   n_estimators=100,
+                                   objective='reg:linear',  # 此默认参数与 XGBClassifier 不同
+                                   booster='gbtree',
+                                   gamma=0,
+                                   min_child_weight=1,
+                                   subsample=1,
+                                   colsample_bytree=1,
+                                   reg_alpha=0,
+                                   reg_lambda=1,
+                                   random_state=0)
+    model_r.fit(x_train, encoded_y_train)  # 训练模型（训练集）
+    # model_r.save_model('xgb100.model')  # 保存模型
+    y_predict = model_r.predict(x_test)  # 模型预测（测试集），y_pred为预测结果
 
     cfg_train_times = train_cfg.get_times()
     offset = 1  # 偏移，因为预处理的 labels 一定是 0,...n-1。所以要加偏移才是实际分数
@@ -57,7 +96,7 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
 
         cross_verify_times = train_cfg.get_cross_verify_times()
         result: TrainResult = cross_verify.cross_verify_no_group_all(cross_verify_times, test_data_set,
-                                                                     test_labels_times)
+                                                                     test_labels_times, train_predict_xgb_regressor)
         result_list.append(result)
         print("----------end idx = " + str(columns_idx) + "--------------------")
     return result_list[0]
