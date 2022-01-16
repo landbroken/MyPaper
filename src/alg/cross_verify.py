@@ -17,7 +17,6 @@ from src.alg import knn_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.train import train_cfg, train
 from src.train.confusion_matrix import ConfusionMatrix, ConfusionMatrixHelper
-from src.train.train_bad import train_predict
 from src.train.train_result import TrainResult
 
 
