@@ -7,6 +7,7 @@
 # @Author  : LinYulong
 # https://www.cnblogs.com/wanglei5205/p/8578486.html
 # https://www.cnblogs.com/wanglei5205/p/8495773.html
+# https://blog.csdn.net/liuzonghao88/article/details/88895986?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.no_search_link&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.no_search_link&utm_relevant_index=1
 
 from sklearn import datasets  # 载入数据集
 from sklearn.model_selection import train_test_split  # 载入数据分割函数train_test_split
@@ -27,8 +28,8 @@ x_train, x_test, y_train, y_test = train_test_split(digits.data,  # 特征空间
                                                     random_state=33)  # 为了复现实验，设置一个随机数
 
 # 模型相关
-model = XGBClassifier()  # 载入模型（模型命名为model)
-model.fit(x_train, y_train)  # 训练模型（训练集）
+model = XGBClassifier(use_label_encoder=False)  # 载入模型（模型命名为model)
+model.fit(x_train, y_train, eval_metric='rmse')  # 训练模型（训练集）
 y_pred = model.predict(x_test)  # 模型预测（测试集），y_pred为预测结果
 
 # 性能度量

@@ -16,6 +16,8 @@ from src.alg import cross_verify, decision_tree_helper, math_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
 from src.train import chd_helper, train_cfg, train, train_bad
+
+
 # from src.train.confusion_matrix import ConfusionMatrix
 # from src.train.train_result import TrainResult
 
@@ -106,15 +108,15 @@ def simplify_in_one_group(df: pandas.DataFrame):
     # 简化计算表格
     question_size = df_train.columns.size
     min_err_percent = 0  # 初始化预测错误率
-    while question_size > 1:
-        if min_err_percent > 0.4:
+    for idx in range(0, question_size - 1):
+        print("begin idx = " + str(idx))
+        if min_err_percent > 0.5:
             # 错误率过高提前跳出
             break
 
         # 当前轮简化
-        cross_verify_times = train_cfg.get_cross_verify_times()
-        result = cross_verify.cross_verify_no_group_all(cross_verify_times, df_train, train_bad.train_no_group_all)
-        print(result)
+        train_bad.train_no_group_all(df_train)
+        print("end idx = " + str(idx))
         # min_idx = math_helper.min_id(rmse_arr)
         # min_err_percent = err_percent[min_idx]
         # print("cur rmse = " + str(rmse_arr[min_idx]) +
