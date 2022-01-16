@@ -60,7 +60,7 @@ def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
     model_r = xgboost.XGBRegressor(max_depth=3,
                                    learning_rate=0.1,
                                    n_estimators=100,
-                                   objective='reg:linear',  # 此默认参数与 XGBClassifier 不同
+                                   objective='reg:squarederror',  # 此默认参数与 XGBClassifier 不同
                                    booster='gbtree',
                                    gamma=0,
                                    min_child_weight=1,

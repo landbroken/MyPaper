@@ -51,7 +51,9 @@ class TrainResult:
         sd_res = math_helper.my_standard_deviation_of_residuals(y_test_labels, y_predict)
         self.sd_res_columns_.append(sd_res)
         #
-        accuracy = accuracy_score(y_test_labels, y_predict)
+        accuracy = 0
+        if isinstance(y_predict[0], int):
+            accuracy = accuracy_score(y_test_labels, y_predict)  # 回归问题
         self.accuracy_columns_.append(accuracy)
 
     def print_average_result(self):

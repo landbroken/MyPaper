@@ -6,20 +6,14 @@
 # @Time    : 2021/11/7
 # @Author  : LinYulong
 # @Description 组内简化
-from enum import EnumMeta
-from typing import Union
 
 import numpy
 import pandas
 
-from src.alg import cross_verify, decision_tree_helper, math_helper
+from src.alg import decision_tree_helper
 from src.alg.medicine_type import DiseaseCheckType
 from src.excel import excel_helper
-from src.train import chd_helper, train_cfg, train, train_bad
-
-
-# from src.train.confusion_matrix import ConfusionMatrix
-# from src.train.train_result import TrainResult
+from src.train import train_cfg, train_bad
 
 
 def get_group_result(df: pandas.DataFrame):
@@ -48,7 +42,7 @@ def merge_to_one_columns(df: pandas.DataFrame):
     return ret
 
 
-def get_df_feature(df: pandas.DataFrame) -> pandas.DataFrame:
+def chd_get_df_feature(df: pandas.DataFrame) -> pandas.DataFrame:
     feature = df[
         [
             'CHD1', 'CHD2', 'CHD3', 'CHD4', 'CHD5', 'CHD6', 'CHD7', 'CHD8', 'CHD9', 'CHD10',
@@ -56,6 +50,10 @@ def get_df_feature(df: pandas.DataFrame) -> pandas.DataFrame:
         ]
     ]
     return feature
+
+
+def hy_get_df_feature(df: pandas.DataFrame) -> pandas.DataFrame:
+    return df
 
 
 def get_df_importance(df: pandas.DataFrame) -> pandas.DataFrame:
@@ -104,7 +102,7 @@ def simplify_in_one_group(df: pandas.DataFrame):
         print(group_first_name + "group only one question, do not need to simplify")
         return
     # 重要性排序
-    df_train = get_df_feature(df)
+    df_train = chd_get_df_feature(df)
     # 简化计算表格
     question_size = df_train.columns.size
     min_err_percent = 0  # 初始化预测错误率
@@ -191,7 +189,7 @@ def get_cur_sample_group(df: pandas.DataFrame, pre_idx: list[int]) -> pandas.Dat
     return ret
 
 
-def sub_df_get(df: pandas.DataFrame) -> pandas.DataFrame:
+def chd_sub_df_get(df: pandas.DataFrame) -> pandas.DataFrame:
     line_size = df.index.size
     columns_size = 14
     np_zero = numpy.zeros(shape=(line_size, columns_size + 1), dtype=int)
@@ -209,14 +207,20 @@ def sub_df_get(df: pandas.DataFrame) -> pandas.DataFrame:
     return ret
 
 
-def simplify_in_group_with_df(df_origin: pandas.DataFrame):
-    df_train = sub_df_get(df_origin)
+def hy_sub_df_get(df: pandas.DataFrame) -> pandas.DataFrame:
+    return df
+
+
+def simplify_chd_in_group_main():
+    df_origin: pandas.DataFrame = excel_helper.read_resource("/CHD.xlsx")
+    df_train = chd_sub_df_get(df_origin)
     simplify_in_one_group(df_train)
 
 
-def simplify_in_group_main(filepath: str):
-    df_origin: pandas.DataFrame = excel_helper.read_resource(filepath)
-    simplify_in_group_with_df(df_origin)
+def simplify_hy_in_group_main():
+    df_origin: pandas.DataFrame = excel_helper.read_resource("/高血压.xlsx")
+    df_train = hy_sub_df_get(df_origin)
+    simplify_in_one_group(df_train)
 
 
 if __name__ == "__main__":
@@ -228,4 +232,4 @@ if __name__ == "__main__":
     """
     train_cfg.set_times(1)
     train_cfg.set_cross_verify_times(10)  # 10 折交叉验证
-    simplify_in_group_main("/CHD.xlsx")
+    simplify_chd_in_group_main()
