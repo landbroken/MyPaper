@@ -119,9 +119,11 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
 
 
 def train_no_group_all_predict(begin_df: pandas.DataFrame, origin_df: pandas.DataFrame, train_result_list: list):
-    for idx in range(len(train_result_list) - 1, 0):
-        x_test = begin_df
-        cur_old_train_result: TrainResult = train_result_list[idx]
+    train_result_list_len = len(train_result_list)
+    x_test = begin_df.copy(deep=True)
+    for idx in range(0, train_result_list_len):
+        cur_train_result_idx = train_result_list_len - idx - 1
+        cur_old_train_result: TrainResult = train_result_list[cur_train_result_idx]
         model = cur_old_train_result.get_model()
         old_id = cur_old_train_result.get_id()
         if model is None:
@@ -140,3 +142,8 @@ def train_no_group_all_predict(begin_df: pandas.DataFrame, origin_df: pandas.Dat
         cur_new_train_result.print_average_result()
 
         # 下一轮数据
+        column_name = "CHD" + str(old_id + 1)
+        x_test.insert(old_id, column_name, y_predict)
+        print("--- insert {} ---".format(column_name))
+
+    print("--- end predict ---")

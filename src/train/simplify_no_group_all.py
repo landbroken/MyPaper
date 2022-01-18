@@ -108,13 +108,14 @@ def simplify_in_one_group(df: pandas.DataFrame):
     question_size = df_train.columns.size
     cur_df = df_train
     train_result_list = []
+    used_id = set()
     for idx in range(0, question_size - 1):
         print("begin idx = " + str(idx))
         # 当前轮简化
         last_result: TrainResult = train_bad.train_no_group_all(cur_df)
-        train_result_list.append(last_result)
         # 下一轮数据
-        next_df, min_df = train.column_split(cur_df, last_result.get_id())
+        old_id = last_result.get_id()
+        next_df, min_df = train.column_split(cur_df, old_id)
         cur_df = next_df
         print("--- end idx = {} ---".format(idx))
         # 提前跳出
@@ -123,9 +124,16 @@ def simplify_in_one_group(df: pandas.DataFrame):
             # 错误率过高提前跳出
             break
 
+        real_id = old_id
+        while real_id in used_id:
+            real_id = real_id + 1
+        used_id.add(real_id)
+        last_result.set_id(real_id)
+        train_result_list.append(last_result)
+        print("real delete column name = {}".format((real_id + 1)))
         # 用当前轮剩余数据，一直预测到全部题组，并打印过程偏差
-        if idx == 0:
-            continue  # 跳过第一次
+        # if idx == 0:
+        #     continue  # 跳过第一次
         train_bad.train_no_group_all_predict(cur_df, df_train, train_result_list)
 
     print("=== end simplify in one group ===")

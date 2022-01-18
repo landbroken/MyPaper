@@ -34,6 +34,19 @@ def column_split(df: pandas.DataFrame, columns_idx: int):
     return data_set, labels
 
 
+def column_insert(df: pandas.DataFrame, columns_name: str, insert_data, columns_idx: int):
+    """
+    切分指定的列
+    :param df: 待切分的 DataFrame
+    :param columns_name: 列名
+    :param insert_data: 待插入数据
+    :param columns_idx: 指定列序号
+    :return: 其余列，指定列
+    """
+    df.insert(columns_idx, columns_name, insert_data)
+    return df
+
+
 def caculate_err_percent(err_arr: numpy.ndarray):
     abs_arr = numpy.abs(err_arr)
     columns_size = err_arr.shape[1]
