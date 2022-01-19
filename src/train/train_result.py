@@ -19,6 +19,7 @@ class TrainResult:
         self.model_: Optional[Union[XGBClassifier, XGBRegressor]] = None  # 训练用模型
         self.id_: int = 0  # 结果所属数据标识
         self.rmse_columns_ = []
+        self.rmse_avg_ = 0.0
         self.err_columns_ = []
         self.r_columns_ = []
         self.r2_columns_ = []
@@ -40,6 +41,16 @@ class TrainResult:
 
     def get_id(self) -> int:
         return self.id_
+
+    def get_avg_rmse(self):
+        rmse_arr = numpy.array(self.rmse_columns_)
+        self.rmse_avg_ = numpy.average(rmse_arr)
+        return self.rmse_avg_
+
+    def get_avg_r2(self):
+        r2_arr = numpy.array(self.r2_columns_)
+        self.r2_avg_ = numpy.average(r2_arr)
+        return self.r2_avg_
 
     def append_single_result(self, y_predict: numpy.ndarray, y_test_labels: numpy.ndarray):
         # 求偏差，离散程度
@@ -73,6 +84,9 @@ class TrainResult:
         self.accuracy_columns_.append(accuracy)
 
     def print_average_result(self):
+        rmse_avg = self.get_avg_rmse()
+        print("rmse avg = " + str(rmse_avg))
+
         r_avg = numpy.average(self.r_columns_)
         print("r avg = " + str(r_avg))
 
@@ -93,8 +107,3 @@ class TrainResult:
 
         accuracy_avg = numpy.average(self.accuracy_columns_)
         print("accuracy_avg = " + str(accuracy_avg))
-
-    def get_avg_r2(self):
-        r2_arr = numpy.array(self.r2_columns_)
-        self.r2_avg_ = numpy.average(r2_arr)
-        return self.r2_avg_

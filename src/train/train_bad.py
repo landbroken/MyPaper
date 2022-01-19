@@ -70,7 +70,7 @@ def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
                                    reg_alpha=0,
                                    reg_lambda=1,
                                    random_state=0)
-    model_r.fit(x_train, encoded_y_train)  # 训练模型（训练集）
+    model_r.fit(x_train, encoded_y_train, eval_metric='rmse')  # 训练模型（训练集）
     # model_r.save_model('xgb100.model')  # 保存模型
     y_predict = model_r.predict(x_test)  # 模型预测（测试集），y_pred为预测结果
 

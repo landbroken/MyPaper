@@ -110,7 +110,7 @@ def simplify_in_one_group(df: pandas.DataFrame):
     train_result_list = []
     used_id = set()
     for idx in range(0, question_size - 1):
-        print("begin idx = " + str(idx))
+        print("--- begin idx = " + str(idx) + " ---")
         # 当前轮简化
         last_result: TrainResult = train_bad.train_no_group_all(cur_df)
         # 下一轮数据
@@ -119,9 +119,10 @@ def simplify_in_one_group(df: pandas.DataFrame):
         cur_df = next_df
         print("--- end idx = {} ---".format(idx))
         # 提前跳出
-        finish_param = last_result.get_avg_r2()
-        if finish_param < 0.4:
+        finish_param = last_result.get_avg_rmse()
+        if finish_param > 0.3:
             # 错误率过高提前跳出
+            print("break train and predict")
             break
 
         real_id = old_id
@@ -135,6 +136,7 @@ def simplify_in_one_group(df: pandas.DataFrame):
         # if idx == 0:
         #     continue  # 跳过第一次
         train_bad.train_no_group_all_predict(cur_df, df_train, train_result_list)
+        print("--- predict ---")
 
     print("=== end simplify in one group ===")
 
