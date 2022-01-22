@@ -9,6 +9,7 @@
 import numpy
 import pandas
 import xgboost
+from sklearn.ensemble import ExtraTreesRegressor
 from xgboost import XGBClassifier
 
 from src.alg import cross_verify
@@ -80,6 +81,14 @@ def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
     return y_predict, model_r
 
 
+def train_predict_random_forest_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
+                                          y_train: numpy.ndarray):
+    model = ExtraTreesRegressor()
+    model.fit(x_train, y_train)  # 训练模型（训练集）
+    y_predict = model.predict(x_test)  # 模型预测（测试集），y_pred为预测结果
+    return y_predict, model
+
+
 def get_best_result(result_list: list):
     best_i = 0
     ret_result: TrainResult = result_list[best_i]
@@ -107,7 +116,8 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
 
         cross_verify_times = train_cfg.get_cross_verify_times()
         result: TrainResult = cross_verify.cross_verify_no_group_all(cross_verify_times, test_data_set,
-                                                                     test_labels_times, train_predict_xgb_regressor)
+                                                                     test_labels_times,
+                                                                     train_predict_random_forest_regressor)
         result.set_id(columns_idx)
         result_list.append(result)
 

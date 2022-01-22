@@ -22,6 +22,7 @@ class TrainResult:
         self.rmse_avg_ = 0.0
         self.err_columns_ = []
         self.r_columns_ = []
+        self.r_avg_ = 0.0
         self.r2_columns_ = []
         self.r2_avg_ = 0.0
         self.mae_columns_ = []
@@ -46,6 +47,11 @@ class TrainResult:
         rmse_arr = numpy.array(self.rmse_columns_)
         self.rmse_avg_ = numpy.average(rmse_arr)
         return self.rmse_avg_
+
+    def get_avg_r(self):
+        r_arr = numpy.array(self.r_columns_)
+        self.r_avg_ = numpy.average(r_arr)
+        return self.r_avg_
 
     def get_avg_r2(self):
         r2_arr = numpy.array(self.r2_columns_)
@@ -87,7 +93,7 @@ class TrainResult:
         rmse_avg = self.get_avg_rmse()
         print("rmse avg = " + str(rmse_avg))
 
-        r_avg = numpy.average(self.r_columns_)
+        r_avg = self.get_avg_r()
         print("r avg = " + str(r_avg))
 
         r2_avg = self.get_avg_r2()

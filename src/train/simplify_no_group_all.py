@@ -119,8 +119,8 @@ def simplify_in_one_group(df: pandas.DataFrame):
         cur_df = next_df
         print("--- end idx = {} ---".format(idx))
         # 提前跳出
-        finish_param = last_result.get_avg_rmse()
-        if finish_param > 0.3:
+        finish_param = last_result.get_avg_r()
+        if finish_param < 0.4:
             # 错误率过高提前跳出
             print("break train and predict")
             break
