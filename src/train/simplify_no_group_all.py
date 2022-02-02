@@ -90,6 +90,20 @@ def get_df_importance(df: pandas.DataFrame) -> pandas.DataFrame:
     return ret
 
 
+def set_real_id_name(last_result: TrainResult, cur_df: pandas.DataFrame):
+    cur_table_header_list: list = cur_df.columns.values.tolist()
+    old_id = last_result.get_id()
+    cur_header_value: str = cur_table_header_list[old_id]
+    last_result.set_name(cur_header_value)
+    # print("will delete column = {}".format(cur_header_value))
+    # real_id_str: str = cur_header_value.replace("CHD", "")
+    # if real_id_str.isdigit():
+    #     real_id = int(real_id_str)
+    #     return real_id
+    # else:
+    #     raise ValueError("can not change to real id, {}".format(cur_header_value))
+
+
 def simplify_in_one_group(df: pandas.DataFrame):
     """
     单个题组内简化
@@ -108,11 +122,11 @@ def simplify_in_one_group(df: pandas.DataFrame):
     question_size = df_train.columns.size
     cur_df = df_train
     train_result_list = []
-    used_id = set()
     for idx in range(0, question_size - 1):
         print("--- begin idx = " + str(idx) + " ---")
         # 当前轮简化
         last_result: TrainResult = train_bad.train_no_group_all(cur_df)
+        set_real_id_name(last_result, cur_df)
         # 下一轮数据
         old_id = last_result.get_id()
         next_df, min_df = train.column_split(cur_df, old_id)
@@ -125,18 +139,14 @@ def simplify_in_one_group(df: pandas.DataFrame):
             print("break train and predict")
             break
 
-        real_id = old_id
-        while real_id in used_id:
-            real_id = real_id + 1
-        used_id.add(real_id)
-        last_result.set_id(real_id)
         train_result_list.append(last_result)
-        print("real delete column name = {}".format((real_id + 1)))
         # 用当前轮剩余数据，一直预测到全部题组，并打印过程偏差
         # if idx == 0:
         #     continue  # 跳过第一次
         train_bad.train_no_group_all_predict(cur_df, df_train, train_result_list)
-        print("--- predict ---")
+        # 单轮打印分割
+        print("--- end predict of idx = {} ---".format(idx))
+        print("")
 
     print("=== end simplify in one group ===")
 

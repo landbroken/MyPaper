@@ -18,6 +18,7 @@ class TrainResult:
     def __init__(self):
         self.model_: Optional[Union[XGBClassifier, XGBRegressor]] = None  # 训练用模型
         self.id_: int = 0  # 结果所属数据标识
+        self.name_: str = ""  # 结果所属数据标识，字符串
         self.rmse_columns_ = []
         self.rmse_avg_ = 0.0
         self.err_columns_ = []
@@ -42,6 +43,12 @@ class TrainResult:
 
     def get_id(self) -> int:
         return self.id_
+
+    def set_name(self, in_name: str):
+        self.name_ = in_name
+
+    def get_name(self):
+        return self.name_
 
     def get_avg_rmse(self):
         rmse_arr = numpy.array(self.rmse_columns_)

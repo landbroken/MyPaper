@@ -13,6 +13,11 @@ from pandas import DataFrame
 df = pd.DataFrame([['Snow', 'M', 22], ['Tyrion', 'M', 32], ['Sansa', 'F', 18], ['Arya', 'F', 14]],
                   columns=['name', 'gender', 'age'])
 print(df)
+table_header_list = df.columns.values.tolist()
+print("--------- table_header_list ---------")
+print(table_header_list)
+print("--------- end table_header_list ---------")
+print("")
 
 df2 = df.iloc[:, 0:2]  # 全部行，[0,2)列
 print(df2)

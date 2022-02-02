@@ -117,7 +117,7 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
         cross_verify_times = train_cfg.get_cross_verify_times()
         result: TrainResult = cross_verify.cross_verify_no_group_all(cross_verify_times, test_data_set,
                                                                      test_labels_times,
-                                                                     train_predict_random_forest_regressor)
+                                                                     train_predict_xgb_regressor)
         result.set_id(columns_idx)
         result_list.append(result)
 
@@ -152,8 +152,18 @@ def train_no_group_all_predict(begin_df: pandas.DataFrame, origin_df: pandas.Dat
         cur_new_train_result.print_average_result()
 
         # 下一轮数据
-        column_name = "CHD" + str(old_id + 1)
-        x_test.insert(old_id, column_name, y_predict)
-        print("--- insert {} ---".format(column_name))
+        column_name = cur_old_train_result.get_name()
+        try:
+            x_test.insert(old_id, column_name, y_predict)
+            print("--- insert {} ---".format(column_name))
+        except ValueError:
+            print("--- insert ValueError! {} ---".format(column_name))
+            raise ValueError
+        except TypeError:
+            print("--- insert TypeError! {} ---".format(column_name))
+            raise TypeError
+        except BaseException:
+            print("--- insert BaseException! {} ---".format(column_name))
+            raise BaseException
 
     print("--- end predict ---")
