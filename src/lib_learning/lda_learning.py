@@ -47,9 +47,10 @@ def main():
     y_min, y_max = x_2d[:, 1].min() - 1, x_2d[:, 1].max() + 1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
                          np.arange(y_min, y_max, h))
-    Z = lda.predict(np.c_[xx.ravel(), yy.ravel()])
-    Z = Z.reshape(xx.shape)
-    plt.contourf(xx, yy, Z, cmap=plt.cm.Paired)
+    tmp = np.c_[xx.ravel(), yy.ravel()]
+    z = lda.predict(tmp)
+    z = z.reshape(xx.shape)
+    plt.contourf(xx, yy, z, cmap=plt.cm.Paired)
 
     # 做出原来的散点图
     class1_x = x_2d[y == 0, 0]

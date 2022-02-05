@@ -9,6 +9,7 @@
 import numpy
 import pandas
 import xgboost
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import ExtraTreesRegressor
 from xgboost import XGBClassifier
 
@@ -79,6 +80,15 @@ def train_predict_xgb_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
     offset = 1  # 偏移，因为预处理的 labels 一定是 0,...n-1。所以要加偏移才是实际分数
     y_predict = y_predict / cfg_train_times + offset
     return y_predict, model_r
+
+
+def train_predict_linear_discriminant_analysis(x_test: numpy.ndarray, x_train: numpy.ndarray,
+                                               y_train: numpy.ndarray):
+    model_lda = LinearDiscriminantAnalysis(n_components=2)
+    model_lda.fit(x_train, y_train)
+
+    y_predict = model_lda.predict(x_test)
+    return y_predict, model_lda
 
 
 def train_predict_random_forest_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
