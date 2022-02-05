@@ -17,7 +17,7 @@ from src.alg import cross_verify
 from src.train import train_cfg
 from src.train.train import column_split
 from src.train.train_result import TrainResult
-from sklearn import preprocessing
+from sklearn import preprocessing, linear_model
 
 
 def get_encoded_train_labels(np_train_labels: numpy.ndarray):
@@ -89,6 +89,15 @@ def train_predict_linear_discriminant_analysis(x_test: numpy.ndarray, x_train: n
 
     y_predict = model_lda.predict(x_test)
     return y_predict, model_lda
+
+
+def train_predict_lasso(x_test: numpy.ndarray, x_train: numpy.ndarray,
+                        y_train: numpy.ndarray):
+    clf = linear_model.Lasso(alpha=0.1)
+    clf.fit(x_train, y_train)
+
+    y_predict = clf.predict(x_test)
+    return y_predict, clf
 
 
 def train_predict_random_forest_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
