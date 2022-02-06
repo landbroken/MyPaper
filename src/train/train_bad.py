@@ -11,6 +11,7 @@ import pandas
 import xgboost
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 
 from src.alg import cross_verify
@@ -98,6 +99,15 @@ def train_predict_lasso(x_test: numpy.ndarray, x_train: numpy.ndarray,
 
     y_predict = clf.predict(x_test)
     return y_predict, clf
+
+
+def train_predict_logistics_regress(x_test: numpy.ndarray, x_train: numpy.ndarray,
+                        y_train: numpy.ndarray):
+    lr = LogisticRegression()
+    lr.fit(x_train, y_train)
+
+    y_predict = lr.predict(x_test)
+    return y_predict, lr
 
 
 def train_predict_random_forest_regressor(x_test: numpy.ndarray, x_train: numpy.ndarray,
