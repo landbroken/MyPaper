@@ -5,23 +5,16 @@
 #
 # @Time    : 2022/2/7
 # @Author  : LinYulong
-# @Description:
+# @Description: 逻辑斯蒂回归模型Logistics regression
 # https://blog.csdn.net/u013421629/article/details/78470020
 
-# from __future__ import division
-
-# 逻辑斯蒂回归模型Logostics regression
-# 导入pandas与numpy工具包。
 import pandas as pd
 import numpy as np
 from sklearn.metrics import confusion_matrix
-# 从sklearn.preprocessing里导入StandardScaler。
 from sklearn.preprocessing import StandardScaler
-# 从sklearn.linear_model里导入LogisticRegression与SGDClassifier。
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import train_test_split
-# 从sklearn.metrics里导入classification_report模块。
 from sklearn.metrics import classification_report
 
 # 创建特征列表。
@@ -58,16 +51,18 @@ ss = StandardScaler()
 x_train = ss.fit_transform(x_train)
 x_test = ss.transform(x_test)
 
-# 初始化LogisticRegression与SGDClassifier。
+# 初始化LogisticRegression
 lr = LogisticRegression()
-sgdc = SGDClassifier()
-
 # 调用LogisticRegression中的fit函数/模块用来训练模型参数。
 lr.fit(x_train, y_train)
 # 使用训练好的模型lr对X_test进行预测，结果储存在变量lr_y_predict中。
 lr_y_predict = lr.predict(x_test)
+print("=== lr_y_predict ===")
+print(lr_y_predict)
+print("=== end lr_y_predict ===")
 
-# print lr_y_predict
+# 初始化GDClassifier。
+sgdc = SGDClassifier()
 # 调用SGDClassifier中的fit函数/模块用来训练模型参数。
 sgdc.fit(x_train, y_train)
 # 使用训练好的模型sgdc对X_test进行预测，结果储存在变量sgdc_y_predict中。

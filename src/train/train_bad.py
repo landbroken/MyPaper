@@ -12,6 +12,7 @@ import xgboost
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
 from src.alg import cross_verify
@@ -102,7 +103,11 @@ def train_predict_lasso(x_test: numpy.ndarray, x_train: numpy.ndarray,
 
 
 def train_predict_logistics_regress(x_test: numpy.ndarray, x_train: numpy.ndarray,
-                        y_train: numpy.ndarray):
+                                    y_train: numpy.ndarray):
+    ss = StandardScaler()
+    x_train = ss.fit_transform(x_train)
+    x_test = ss.transform(x_test)
+
     lr = LogisticRegression()
     lr.fit(x_train, y_train)
 
@@ -146,7 +151,7 @@ def train_no_group_all(test_df: pandas.DataFrame) -> TrainResult:
         cross_verify_times = train_cfg.get_cross_verify_times()
         result: TrainResult = cross_verify.cross_verify_no_group_all(cross_verify_times, test_data_set,
                                                                      test_labels_times,
-                                                                     train_predict_xgb_regressor)
+                                                                     train_predict_logistics_regress)
         result.set_id(columns_idx)
         result_list.append(result)
 
