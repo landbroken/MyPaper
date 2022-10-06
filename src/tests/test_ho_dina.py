@@ -1,8 +1,8 @@
 # coding=utf-8
 from __future__ import print_function, division, unicode_literals
 import numpy as np
-from psy import McmcHoDina
-from psy.utils import r4beta
+from src.psy import McmcHoDina
+from src.psy.utils import r4beta
 
 
 def test_ho_dina():

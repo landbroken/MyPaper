@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import print_function, division, unicode_literals
-from psy import Irt, data
+from src.psy import Irt, data
 
 
 class TestIrt(object):

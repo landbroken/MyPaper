@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import print_function, division, unicode_literals
 import numpy as np
-from psy import cfa, data
+from src.psy import cfa, data
 
 
 def test_cfa():

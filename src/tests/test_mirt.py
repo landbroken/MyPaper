@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import print_function, division, unicode_literals
-from psy import Mirt, data
+from src.psy import Mirt, data
 
 
 def test_mirt():

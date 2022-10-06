@@ -1,8 +1,8 @@
 # coding=utf-8
 from __future__ import print_function, division, unicode_literals
 import numpy as np
-from psy import EmDina, MlDina
-from psy.utils import r4beta
+from src.psy import EmDina, MlDina
+from src.psy.utils import r4beta
 
 
 def test_em_dina():

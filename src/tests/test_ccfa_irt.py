@@ -1,7 +1,7 @@
 # coding=utf-8
-from __future__ import  print_function, division, unicode_literals
+from __future__ import print_function, division, unicode_literals
 import numpy as np
-from psy import delta_i_ccfa, get_irt_parameter, get_thresholds, data
+from src.psy import delta_i_ccfa, get_irt_parameter, get_thresholds, data
 
 
 def test_ccfa_irt():

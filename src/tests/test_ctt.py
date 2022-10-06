@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import print_function, division, unicode_literals
 from psy.ctt import BivariateCtt
-from psy import data
+from src.psy import data
 
 
 def test_ctt():
