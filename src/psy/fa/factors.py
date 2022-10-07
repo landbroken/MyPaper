@@ -4,9 +4,7 @@ from psy.utils import cached_property
 
 
 class Factor(object):
-
-    # 简单的因子分析，服务于mirt的初值估计
-
+    # 因子分析
     def __init__(self, scores, factors_num):
         self._scores = scores
         self._factors_num = factors_num
@@ -31,18 +29,17 @@ class Factor(object):
 
     @staticmethod
     def _get_eigen(cov):
-        score_eig = np.linalg.eig(cov)
-        idx = score_eig[0].argsort()
-        eigenvalues = score_eig[0][idx][::-1]
-        _eigenvectors = score_eig[1][:, idx][:, ::-1]
-        eigenvectors = _eigenvectors * np.sign(np.sum(_eigenvectors, 0))
+        score_eig: tuple = np.linalg.eig(cov)
+        idx: np.ndarray = score_eig[0].argsort()
+        eigenvalues: np.ndarray = score_eig[0][idx][::-1]
+        _eigenvectors: np.ndarray = score_eig[1][:, idx][:, ::-1]
+        eigenvectors: np.ndarray = _eigenvectors * np.sign(np.sum(_eigenvectors, 0))
         return eigenvalues, eigenvectors
 
-    @property
     def loadings(self):
         # 因子载荷
-        cov = self.cor
-        score_eig = self._get_eigen(cov)
-        _loadings = score_eig[0] ** 0.5 * score_eig[1]
-        loadings = _loadings[:, :self._factors_num]
+        cov: np.ndarray = self.cor
+        eigen_values, eigen_vectors = self._get_eigen(cov)
+        _loadings: np.ndarray = eigen_values ** 0.5 * eigen_vectors
+        loadings: np.ndarray = _loadings[:, :self._factors_num]
         return loadings
